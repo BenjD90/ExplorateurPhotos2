@@ -1,4 +1,4 @@
-package com.benjd90;
+package com.benjd90.photos2;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;

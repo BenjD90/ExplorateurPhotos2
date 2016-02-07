@@ -1,5 +1,6 @@
 package com.benjd90;
 
+import com.benjd90.photos2.DemoApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.web.WebAppConfiguration;
