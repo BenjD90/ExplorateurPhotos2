@@ -3,12 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.benjd90.photos2</groupId>
-	<artifactId>benjd90</artifactId>
+	<groupId>com.benjd90</groupId>
+	<artifactId>photos2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>demo</name>
+	<name>photos2</name>
 	<description>Explorateur de photos 2</description>
 
 	<parent>
@@ -21,7 +21,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
-		<start-class>com.benjd90.photos2.DemoApplication</start-class>
 	</properties>
 
 	<dependencies>
@@ -47,6 +46,12 @@
 	</dependencies>
 	
 	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -54,6 +59,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 
 </project>
