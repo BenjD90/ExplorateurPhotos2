@@ -11,6 +11,8 @@ public class FileLight {
     private String path;
     private Date dateEdit;
     private long size;
+    private boolean isDirectory;
+
 
     public String getPath() {
         return path;
@@ -34,5 +36,13 @@ public class FileLight {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public boolean getIsDirectory() {
+        return isDirectory;
+    }
+
+    public void setIsDirectory(boolean isDirectory) {
+        this.isDirectory = isDirectory;
     }
 }

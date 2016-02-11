@@ -22,13 +22,28 @@ public class FileLister implements IFileLister {
         File[] list = directory.listFiles();
         List<FileLight> ret = new ArrayList<>();
 
-        if(list != null) {
+        if (list != null) {
             for (File file : list) {
                 FileLight fileLight = new FileLight();
                 fileLight.setPath(file.getPath());
                 fileLight.setSize(file.length());
                 fileLight.setDateEdit(new Date(file.lastModified()));
+                fileLight.setIsDirectory(file.isDirectory());
                 ret.add(fileLight);
+            }
+        }
+
+        return ret;
+    }
+
+    @Override
+    public List<FileLight> getListOfFilesRecursively(String path) throws IOException {
+        List<FileLight> ret = getListOfFiles(path);
+
+        for (int i = 0; i < ret.size(); i++) {
+            FileLight f = ret.get(i);
+            if (f.getIsDirectory()) {
+                ret.addAll(getListOfFiles(f.getPath()));
             }
         }
 

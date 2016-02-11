@@ -12,4 +12,6 @@ import java.util.List;
 public interface IFileLister {
 
     List<FileLight> getListOfFiles(String path) throws IOException;
+
+    List<FileLight> getListOfFilesRecursively(String path) throws IOException;
 }
