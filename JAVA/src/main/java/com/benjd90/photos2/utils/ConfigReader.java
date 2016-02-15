@@ -2,9 +2,12 @@ package com.benjd90.photos2.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.management.snmp.util.SnmpTableHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Benjamin on 11/02/2016.
@@ -12,6 +15,7 @@ import java.io.InputStream;
 public class ConfigReader {
 
     public static final String KEY_PATH = "path";
+    public static final String KEY_PHOTOS_EXTENSION = "photosExtensions";
 
     /**
      * LOGGER For the class.
@@ -37,6 +41,8 @@ public class ConfigReader {
         }
     }
 
+    private static List<String> photosExtensions;
+
     /**
      * Constructor for this class.
      */
@@ -50,6 +56,16 @@ public class ConfigReader {
      * @return the message associate to this key
      */
     public static String getMessage(final String key) {
-        return PROPS.getProperty(key);
+        if(PROPS.getProperty(key) != null) {
+            return PROPS.getProperty(key);
+        } else {
+            LOG.error(key + " not found in file " + PROPERTIES_FILE);
+            return "";
+        }
+    }
+
+    public static List<String> getPhotosExtensions() {
+        String[] values = getMessage(ConfigReader.KEY_PHOTOS_EXTENSION).toLowerCase().split(Constants.SEMICOLON);
+        return Arrays.asList(values);
     }
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 public class FileLight {
 
     private String path;
-    private Date dateEdit;
+    private Date date;
     private long size;
     private boolean isDirectory;
 
@@ -22,12 +22,12 @@ public class FileLight {
         this.path = path;
     }
 
-    public Date getDateEdit() {
-        return dateEdit;
+    public Date getDate() {
+        return date;
     }
 
-    public void setDateEdit(Date dateEdit) {
-        this.dateEdit = dateEdit;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public long getSize() {

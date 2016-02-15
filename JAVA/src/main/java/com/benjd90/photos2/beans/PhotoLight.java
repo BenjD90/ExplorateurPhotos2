@@ -8,5 +8,4 @@ import java.util.Date;
  */
 public class PhotoLight extends FileLight {
 
-
 }
