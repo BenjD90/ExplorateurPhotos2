@@ -8,41 +8,41 @@ import java.util.Date;
  */
 public class FileLight {
 
-    private String path;
-    private Date date;
-    private long size;
-    private boolean isDirectory;
+  private String path;
+  private Date date;
+  private long size;
+  private boolean isDirectory;
 
 
-    public String getPath() {
-        return path;
-    }
+  public String getPath() {
+    return path;
+  }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+  public void setPath(String path) {
+    this.path = path;
+  }
 
-    public Date getDate() {
-        return date;
-    }
+  public Date getDate() {
+    return date;
+  }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+  public void setDate(Date date) {
+    this.date = date;
+  }
 
-    public long getSize() {
-        return size;
-    }
+  public long getSize() {
+    return size;
+  }
 
-    public void setSize(long size) {
-        this.size = size;
-    }
+  public void setSize(long size) {
+    this.size = size;
+  }
 
-    public boolean getIsDirectory() {
-        return isDirectory;
-    }
+  public boolean getIsDirectory() {
+    return isDirectory;
+  }
 
-    public void setIsDirectory(boolean isDirectory) {
-        this.isDirectory = isDirectory;
-    }
+  public void setIsDirectory(boolean isDirectory) {
+    this.isDirectory = isDirectory;
+  }
 }
