@@ -2,13 +2,12 @@ package com.benjd90.photos2.scheduler.utils;
 
 import com.benjd90.photos2.beans.FileLight;
 import com.benjd90.photos2.beans.PhotoLight;
-import com.benjd90.photos2.utils.ConfigReader;
+import com.benjd90.photos2.utils.PhotosUtils;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,27 +67,20 @@ public class PhotosExplorer {
     List<PhotoLight> ret = new ArrayList<>(listToFilter.size());
     for (PhotoLight p : listToFilter) {
       // TODO : Add use of exif
-      if (isPhoto(p)) {
+      if (PhotosUtils.isPhoto(p)) {
         ret.add(p);
       }
     }
     return ret;
   }
 
-  private static boolean isPhoto(File fileToTest) {
-    return ConfigReader.getPhotosExtensions().contains(FilenameUtils.getExtension(fileToTest.getAbsolutePath()).toLowerCase());
-  }
-
-  private static boolean isPhoto(PhotoLight photoToTest) {
-    return ConfigReader.getPhotosExtensions().contains(FilenameUtils.getExtension(photoToTest.getPath()).toLowerCase());
-  }
 
   //TODO add scan on file change https://docs.oracle.com/javase/tutorial/essential/io/notification.html
   public static Date getPhotoDate(File file) throws IOException {
     Date editDate = new Date(file.lastModified());
     Date creationDate = null;
     Date takenDate = null;
-    if (file.isFile() && PhotosExplorer.isPhoto(file)) {
+    if (file.isFile() && PhotosUtils.isPhoto(file)) {
       try {
         Metadata metadata = ImageMetadataReader.readMetadata(file);
         Directory directoryMetadata = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);

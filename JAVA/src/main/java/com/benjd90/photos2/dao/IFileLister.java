@@ -1,7 +1,6 @@
 package com.benjd90.photos2.dao;
 
 import com.benjd90.photos2.beans.PhotoLight;
-import com.fasterxml.jackson.core.JsonParseException;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,5 +11,5 @@ import java.util.List;
  */
 public interface IFileLister {
 
-  public List<PhotoLight> getAllPhotosExisting() throws IOException;
+  List<PhotoLight> getAllPhotosExisting() throws IOException;
 }

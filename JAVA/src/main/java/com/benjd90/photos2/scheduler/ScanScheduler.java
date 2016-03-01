@@ -15,13 +15,13 @@ public class ScanScheduler {
 
   public ScanScheduler() {
     JobDetail job = JobBuilder.newJob(ScanJob.class)
-            .withIdentity("dummyJobName", "group1").build();
+            .withIdentity("scanJob", "group1").build();
 
 
     // Trigger the job to run on the next round minute
     Trigger trigger = TriggerBuilder
             .newTrigger()
-            .withIdentity("dummyTriggerName", "group1")
+            .withIdentity("scanTrigger", "group1")
             .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMinutes(100).repeatForever())
             .build();
 
