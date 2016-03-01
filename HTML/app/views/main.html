@@ -1,5 +1,9 @@
-<div>
-  <div style="display: inline-block; margin : 2px;" ng-repeat="photoLight in listPhotos | limitTo:5:7">
-    <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=120"/>
+<div class="mainPage">
+  <div class="photosList">
+    <a class="photo"
+       ng-repeat-start="photoLight in listPhotos  | limitTo:58:0">
+      <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=120"/>
+    </a>
+    <a ng-repeat-end></a>
   </div>
 </div>
