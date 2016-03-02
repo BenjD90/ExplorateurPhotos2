@@ -1,9 +1,23 @@
 <div class="mainPage">
-  <div class="photosList">
-    <a class="photo"
-       ng-repeat-start="photoLight in listPhotos  | limitTo:58:0">
-      <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=120"/>
-    </a>
-    <a ng-repeat-end></a>
+  <div>
+
   </div>
+
+  <!--<div class="photosList">-->
+  <!--&lt;!&ndash; TODO Add virtual list or pagination &ndash;&gt;-->
+  <!--<a class="photo"-->
+  <!--ng-repeat-start="photoLight in listPhotos  | limitTo:58:200">-->
+  <!--<img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=120"/>-->
+  <!--</a>-->
+  <!--<a ng-repeat-end></a>-->
+  <!--</div>-->
+
+  <!-- TODO add preparation of listPhotos to set attribute to tell when to break line sorts and all filters will stand in controller -->
+  <!-- or find a way to -->
+  <div vs-repeat style="height: 500px; overflow: auto;" class="photosList">
+    <div ng-repeat="photoLight in listPhotos" class="photo">
+      <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=120"/>
+    </div>
+  </div>
+
 </div>

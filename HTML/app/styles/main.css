@@ -55,6 +55,10 @@ body {
 }
 
 .mainPage .photo {
-  display: inline-block;
+  display: block;
+  /*display: inline-block;*/
+  /*vertical-align: middle;*/
   margin: 2px;
+  height: 120px;
+  min-width: 10px;
 }
