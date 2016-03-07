@@ -9,5 +9,6 @@
  */
 angular.module('htmlApp')
   .constant('Config', {
-    urlServices: '//' + location.hostname + ':8081/api'
+    urlServices: '//' + location.hostname + ':8081/api',
+    thumbnailsHeight: 150
   });

@@ -3,3 +3,8 @@
 /.tmp
 /.sass-cache
 /bower_components
+
+
+# IntelliJ project files
+.idea
+*.iml

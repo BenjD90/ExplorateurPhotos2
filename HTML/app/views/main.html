@@ -1,13 +1,13 @@
 <div class="mainPage">
   <div>
-
+    -- {{Config.thumbnailsHeight}} --
   </div>
 
   <!--<div class="photosList">-->
   <!--&lt;!&ndash; TODO Add virtual list or pagination &ndash;&gt;-->
   <!--<a class="photo"-->
   <!--ng-repeat-start="photoLight in listPhotos  | limitTo:58:200">-->
-  <!--<img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=120"/>-->
+  <!--<img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=150"/>-->
   <!--</a>-->
   <!--<a ng-repeat-end></a>-->
   <!--</div>-->
@@ -16,8 +16,9 @@
   <!-- or find a way to -->
   <div vs-repeat style="height: 500px; overflow: auto;" class="photosList">
     <div ng-repeat="photoLight in listPhotos" class="photo">
-      <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height=120"/>
+      <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height={{Config.thumbnailsHeight}}"/>
     </div>
   </div>
+
 
 </div>

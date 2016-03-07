@@ -11,6 +11,8 @@ angular.module('htmlApp')
   .controller('MainCtrl', function (PhotosService, $scope, Config) {
     $scope.urlThumbnail = Config.urlServices + "/thumbnail";
 
+    $scope.Config = Config;
+
     PhotosService.getListPhotos().then(function (response) {
       $scope.listPhotos = response.data;
     });

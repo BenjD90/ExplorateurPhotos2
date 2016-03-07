@@ -1,5 +1,7 @@
 package com.benjd90.photos2.scheduler;
 
+import com.benjd90.photos2.beans.State;
+import com.benjd90.photos2.utils.Constants;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -9,14 +11,19 @@ import org.springframework.stereotype.Component;
 /**
  * Created by Benjamin on 23/02/2016.
  */
-@Component
+@Component("ScanScheduler")
 public class ScanScheduler {
   private static final Logger LOG = LoggerFactory.getLogger(ScanScheduler.class);
+  private final State state = new State();
+  private Scheduler scheduler = null;
 
   public ScanScheduler() {
-    JobDetail job = JobBuilder.newJob(ScanJob.class)
-            .withIdentity("scanJob", "group1").build();
+    JobDataMap jobData = new JobDataMap();
+    jobData.put(Constants.STATE, state);
 
+    JobDetail job = JobBuilder.newJob(ScanJob.class)
+            .usingJobData(jobData)
+            .withIdentity("scanJob", "group1").build();
 
     // Trigger the job to run on the next round minute
     Trigger trigger = TriggerBuilder
@@ -26,7 +33,6 @@ public class ScanScheduler {
             .build();
 
     // schedule it
-    Scheduler scheduler = null;
     try {
       scheduler = new StdSchedulerFactory().getScheduler();
       scheduler.start();
@@ -37,4 +43,7 @@ public class ScanScheduler {
   }
 
 
+  public State getState() {
+    return state;
+  }
 }

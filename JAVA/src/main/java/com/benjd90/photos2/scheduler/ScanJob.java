@@ -1,9 +1,13 @@
 package com.benjd90.photos2.scheduler;
 
+import com.benjd90.photos2.beans.FileLight;
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.beans.PhotosListStorage;
+import com.benjd90.photos2.beans.State;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
 import com.benjd90.photos2.utils.ConfigReader;
+import com.benjd90.photos2.utils.Constants;
+import com.benjd90.photos2.utils.TimeUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.CharEncoding;
 import org.quartz.Job;
@@ -12,7 +16,9 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,16 +26,19 @@ import java.util.List;
  * Job that write the file : listPhotos.json
  * Created by Benjamin on 23/02/2016.
  */
+//TODO add scan on file change https://docs.oracle.com/javase/tutorial/essential/io/notification.html
 public class ScanJob implements Job {
   private static final Logger LOG = LoggerFactory.getLogger(ScanJob.class);
 
   private final String directory = ConfigReader.getMessage(ConfigReader.KEY_APP_DIR);
   private String isRunningFileName = "isRunning.txt";
   private String listFilesFileName = ConfigReader.getMessage(ConfigReader.KEY_FILENAME_LIST_PHOTOS);
+  private State state;
 
   public void execute(JobExecutionContext context)
           throws JobExecutionException {
-
+    long start = System.currentTimeMillis();
+    state = (State) context.getMergedJobDataMap().get(Constants.STATE);
     LOG.info("Start scan job " + directory);
 
     File directoryFile = new File(directory);
@@ -59,11 +68,12 @@ public class ScanJob implements Job {
       }
     }
 
-    LOG.info("End scan job" + directory);
+    state.setActualPath(Constants.EMPTY_STRING);
+    LOG.info("End scan job in " + TimeUtils.getTime(start) + ". " + directory);
   }
 
   private synchronized void runScan() throws IOException {
-    List<PhotoLight> photos = PhotosExplorer.getListOfPhotosRecursively(ConfigReader.getMessage(ConfigReader.KEY_PATH));
+    List<PhotoLight> photos = getListOfPhotosRecursively(ConfigReader.getMessage(ConfigReader.KEY_PATH));
     ObjectMapper mapper = new ObjectMapper();
 
     PhotosListStorage objectToStore = new PhotosListStorage();
@@ -73,11 +83,6 @@ public class ScanJob implements Job {
     File outTempFile = new File(directory, listFilesFileName + ".tmp");
     File outFile = new File(directory, listFilesFileName);
     mapper.writeValue(outTempFile, objectToStore);
-    try {
-      Thread.sleep(10000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
     if (outFile.delete()) {
       if (!outTempFile.renameTo(outFile)) {
         throw new IOException("Can't rename tmp file to nominal" + listFilesFileName);
@@ -115,5 +120,43 @@ public class ScanJob implements Job {
     }
   }
 
+
+  private List<PhotoLight> getListOfPhotos(String path) throws IOException {
+    File directory = new File(path);
+    File[] list = directory.listFiles();
+    List<PhotoLight> ret = new ArrayList<>();
+
+    if (list != null) {
+      for (File file : list) {
+        PhotoLight photoLight = new PhotoLight();
+        photoLight.setPath(file.getPath());
+        this.state.setActualPath(photoLight.getPath());
+        photoLight.setSize(file.length());
+        photoLight.setIsDirectory(file.isDirectory());
+        photoLight.setDate(PhotosExplorer.getPhotoDate(file));
+        Dimension photoDimensions = PhotosExplorer.getDimensions(file);
+        photoLight.setHeight((long) photoDimensions.getHeight());
+        photoLight.setWidth((long) photoDimensions.getWidth());
+        ret.add(photoLight);
+      }
+    }
+
+    return ret;
+  }
+
+  public List<PhotoLight> getListOfPhotosRecursively(String path) throws IOException {
+    List<PhotoLight> ret = getListOfPhotos(path);
+
+    for (int i = 0; i < ret.size(); i++) {
+      FileLight f = ret.get(i);
+      if (f.getIsDirectory()) {
+        ret.addAll(getListOfPhotos(f.getPath()));
+      }
+    }
+
+    ret = PhotosExplorer.filterOnlyPhotos(ret);
+
+    return ret;
+  }
 
 }
