@@ -42,10 +42,13 @@ angular.module('htmlApp')
         var sumWidth = 0;
         while (sumWidth < width && i < listPhotos.length) {
           var photo = listPhotos[i];
-          if (sumWidth + photo.widthThumbnail + photoMargin < width) {
+          if (sumWidth + photo.widthThumbnail + photoMargin <= width) {
             line.push(photo);
             i++;
             sumWidth += photo.widthThumbnail + photoMargin;
+          } else if (photo.widthThumbnail + photoMargin > width) {
+            i++;
+            console.error('Photo ignored');
           } else {
             break;
           }
@@ -71,12 +74,10 @@ angular.module('htmlApp')
       },
       getListPhotosToDisplay: function (width, photoMargin) {
         var ref = this;
-        return $http.get(Config.urlServices + '/photos').then(function (response) {
-          var ret = ref.getListPhotos().then(function (listPhotos) {
-            return transformListPhotoToBeDisplayed(listPhotos, width, photoMargin);
-          });
-          return ret;
+        var ret = ref.getListPhotos().then(function (listPhotos) {
+          return transformListPhotoToBeDisplayed(listPhotos, width, photoMargin);
         });
+        return ret;
       }
     }
   }

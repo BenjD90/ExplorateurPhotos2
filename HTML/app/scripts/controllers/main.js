@@ -8,8 +8,10 @@
  * Controller of the htmlApp
  */
 angular.module('htmlApp')
-  .controller('MainCtrl', function (PhotosService, $scope, Config) {
+  .controller('MainCtrl', function (PhotosService, $scope, Config, $timeout) {
     $scope.urlThumbnail = Config.urlServices + "/thumbnail";
+
+    $scope.isFilterPanelOpen = true;
 
     $scope.Config = Config;
 
@@ -23,6 +25,15 @@ angular.module('htmlApp')
     PhotosService.getListPhotosToDisplay(window.innerWidth - 17, photoMargin).then(function (array) {
         $scope.listPhotosToDisplay = array;
       }
-    )
-    ;
+    );
+
+    var resizeListPhotos = function () {
+      $scope.listPhotosDivHeight = $scope.windowHeight - 2 - $('.header').outerHeight(true) - $('.mainPage .filter').outerHeight(true);
+    };
+
+    $scope.$watch('windowHeight', resizeListPhotos);
+    $scope.$watch('isFilterPanelOpen', function () {
+      $timeout(resizeListPhotos, 200);
+    });
+
   });

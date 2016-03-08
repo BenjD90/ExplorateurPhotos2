@@ -1,9 +1,36 @@
-<div class="mainPage">
-  <div vs-repeat style="height: 800px; overflow: auto;" class="photosList">
+<div class="mainPage" resize>
+  <div class="panel-group filter">
+    <div class="panel panel-default">
+      <div class="panel-heading" ng-click="isFilterPanelOpen = !isFilterPanelOpen">
+        <h4>Filtrer / Trier</h4>
+      </div>
+      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" ng-show="isFilterPanelOpen">
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <form>
+                <input type="text" class="form-control" placeholder="Text input">
+              </form>
+            </div>
+            <div class="col-md-6">
+              <h5>Trier par :</h5>
+              Date<br/>
+              Date d'ajout
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div vs-repeat style="overflow: auto;"
+       ng-style="{height : listPhotosDivHeight}"
+       class="photosList">
     <div ng-repeat="line in listPhotosToDisplay" class="line">
       <a ng-repeat-start="photoLight in line" class="photo">
         <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height={{Config.thumbnailsHeight}}" height="{{photoLight.heightThumbnail}}"
-             width="{{photoLight.widthThumbnail}}"/>
+             width="{{photoLight.widthThumbnail}}" title="{{photoLight | json}}"/>
       </a>
       <a ng-repeat-end></a>
     </div>
