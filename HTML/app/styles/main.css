@@ -50,15 +50,20 @@ body {
   }
 }
 
-.mainPage .photosList {
+.mainPage .photosList .line {
   text-align: justify;
+  text-align-last: justify;
+  font-size: 0px;
 }
 
-.mainPage .photo {
-  display: block;
-  /*display: inline-block;*/
-  /*vertical-align: middle;*/
+.mainPage .photosList .photo {
+  display: inline-block;
+  vertical-align: middle;
   margin: 2px;
-  height: 120px;
+  font-size: 10px;
   min-width: 10px;
+}
+
+.mainPage .photosList .photo img {
+  background-image: url('/images/defaultImg.gif');
 }

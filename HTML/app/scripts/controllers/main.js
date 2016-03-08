@@ -13,7 +13,16 @@ angular.module('htmlApp')
 
     $scope.Config = Config;
 
-    PhotosService.getListPhotos().then(function (response) {
-      $scope.listPhotos = response.data;
+    $scope.a = 5;
+    $scope.time = PhotosService.time;
+    PhotosService.getListPhotos().then(function (data) {
+      $scope.listPhotos = data;
     });
+
+    var photoMargin = 4;
+    PhotosService.getListPhotosToDisplay(window.innerWidth - 17, photoMargin).then(function (array) {
+        $scope.listPhotosToDisplay = array;
+      }
+    )
+    ;
   });
