@@ -4,6 +4,7 @@ import com.benjd90.photos2.beans.FileLight;
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.beans.PhotosListStorage;
 import com.benjd90.photos2.beans.State;
+import com.benjd90.photos2.beans.comparator.PhotoLightDefaultComparator;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
 import com.benjd90.photos2.utils.ConfigReader;
 import com.benjd90.photos2.utils.Constants;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class ScanJob implements Job {
     long start = System.currentTimeMillis();
     state = (State) context.getMergedJobDataMap().get(Constants.STATE);
     LOG.info("Start scan job " + directory);
+    state.setLastStart(start);
 
     File directoryFile = new File(directory);
     if (!directoryFile.exists()) {
@@ -57,6 +60,7 @@ public class ScanJob implements Job {
       } catch (IOException e) {
         LOG.error("IO Error while scanning", e);
         LOG.info("Scan END KO" + directory);
+        state.setLastRunEndState(Constants.KO);
         try {
           PrintWriter writer = new PrintWriter(new FileOutputStream(new File(isRunningFileName)), true);
           writer.println("end=" + new Date().getTime());
@@ -69,6 +73,9 @@ public class ScanJob implements Job {
     }
 
     state.setActualPath(Constants.EMPTY_STRING);
+    state.setLastEnd(System.currentTimeMillis());
+    state.setLastRunEndState(Constants.OK);
+
     LOG.info("End scan job in " + TimeUtils.getTime(start) + ". " + directory);
   }
 
@@ -78,6 +85,7 @@ public class ScanJob implements Job {
 
     PhotosListStorage objectToStore = new PhotosListStorage();
     objectToStore.setDateScan(new Date());
+    Collections.sort(photos, new PhotoLightDefaultComparator());
     objectToStore.setPhotos(photos);
 
     File outTempFile = new File(directory, listFilesFileName + ".tmp");
@@ -134,6 +142,7 @@ public class ScanJob implements Job {
         photoLight.setSize(file.length());
         photoLight.setIsDirectory(file.isDirectory());
         photoLight.setDate(PhotosExplorer.getPhotoDate(file));
+        photoLight.setDateLastModified(new Date(file.lastModified()));
         Dimension photoDimensions = PhotosExplorer.getDimensions(file);
         photoLight.setHeight((long) photoDimensions.getHeight());
         photoLight.setWidth((long) photoDimensions.getWidth());

@@ -7,4 +7,6 @@ public class Constants {
   public static final String EMPTY_STRING = "";
   public static final String SEMICOLON = ";";
   public static final String STATE = "STATE";
+  public static final String OK = "OK";
+  public static final String KO = "KO";
 }
