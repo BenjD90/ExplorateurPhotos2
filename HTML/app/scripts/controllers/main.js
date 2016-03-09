@@ -8,7 +8,7 @@
  * Controller of the htmlApp
  */
 angular.module('htmlApp')
-  .controller('MainCtrl', function (PhotosService, $scope, Config, $timeout) {
+  .controller('MainCtrl', function (PhotosService, $scope, Config, $uibModal, photoModalService) {
     $scope.urlThumbnail = Config.urlServices + "/thumbnail";
 
     $scope.showFilter = false;
@@ -24,6 +24,17 @@ angular.module('htmlApp')
     $scope.reset = function () {
       $scope.filter = {};
     };
+
+    $scope.open = function (photoLight) {
+      photoModalService.setModalInstance($uibModal.open({
+        templateUrl: 'views/modals/photo.html',
+        controller: 'PhotoModalCtrl',
+        size: 'lg',
+        resolve: {
+          photoLight: photoLight
+        }
+      }));
+    }
 
     getListPhotosToDisplay(PhotosService.getListPhotos()).then(function (array) {
       $scope.listPhotosToDisplay = array;

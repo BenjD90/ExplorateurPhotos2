@@ -65,7 +65,7 @@
       <a ng-repeat-start="photoLight in line" class="photo">
         <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height={{photoLight.heightThumbnail}}"
              height="{{photoLight.heightThumbnail}}"
-             width="{{photoLight.widthThumbnail}}" title="{{photoLight | json}}"/>
+             width="{{photoLight.widthThumbnail}}" title="{{photoLight | json}}" ng-click="open(photoLight)"/>
       </a>
       <a ng-repeat-end></a>
     </div>

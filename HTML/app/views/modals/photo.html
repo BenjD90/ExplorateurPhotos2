@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{photo.path}}</h4>
+</div>
+<div class="modal-body" id="photoDisplayArea" style="text-align: center;">
+  <img ng-src="{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{height}}&&width={{width}}"
+       height="{{height}}"
+       width="{{width}}"
+       style="background-image: url('{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{photo.heightThumbnail}}'); background-size: 100% 100%;"
+    />
+</div>
+<div class="modal-footer">
+  footer
+</div>
