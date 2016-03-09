@@ -11,29 +11,81 @@ angular.module('htmlApp')
   .controller('MainCtrl', function (PhotosService, $scope, Config, $timeout) {
     $scope.urlThumbnail = Config.urlServices + "/thumbnail";
 
-    $scope.isFilterPanelOpen = true;
+    $scope.showFilter = false;
+    $scope.filter = {};
+    $scope.sortField = 'dateLastModified';
+    $scope.sortDesc = true;
 
     $scope.Config = Config;
 
     $scope.a = 5;
     $scope.time = PhotosService.time;
-    PhotosService.getListPhotos().then(function (data) {
-      $scope.listPhotos = data;
+
+    getListPhotosToDisplay(PhotosService.getListPhotos()).then(function (array) {
+      $scope.listPhotosToDisplay = array;
     });
 
-    var photoMargin = 4;
-    PhotosService.getListPhotosToDisplay(window.innerWidth - 17, photoMargin).then(function (array) {
-        $scope.listPhotosToDisplay = array;
-      }
-    );
+    $scope.$watch('windowHeight', function () {
+      $scope.listPhotosDivHeight = $scope.windowHeight - 2 - $('.header').outerHeight(true) - $('.subMenu').outerHeight(true);
+    });
 
-    var resizeListPhotos = function () {
-      $scope.listPhotosDivHeight = $scope.windowHeight - 2 - $('.header').outerHeight(true) - $('.mainPage .filter').outerHeight(true);
+
+    $scope.$watchCollection('filter', function (newValue) {
+      getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
+        return filterPhotos(array, newValue);
+      })).then(function (array) {
+        $scope.listPhotosToDisplay = array;
+      });
+    });
+
+    $scope.sort = function (sortField) {
+      //if user doesn't change field
+      if ($scope.sortField == sortField) {
+        $scope.sortDesc = !$scope.sortDesc;
+      }
+      $scope.sortField = sortField;
+      getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
+          return filterPhotos(array, $scope.filter).sort(function (a, b) {
+            if (a[sortField] < b[sortField]) {
+              return $scope.sortDesc ? 1 : -1;
+            } else if (a[sortField] > b[sortField]) {
+              return $scope.sortDesc ? -1 : 1;
+            } else {
+              if (a['path'] < b['path']) {
+                return $scope.sortDesc ? 1 : -1;
+              } else {
+                return $scope.sortDesc ? -1 : 1;
+              }
+            }
+          });
+        }
+      )).
+        then(function (array) {
+          $scope.listPhotosToDisplay = array;
+        });
     };
 
-    $scope.$watch('windowHeight', resizeListPhotos);
-    $scope.$watch('isFilterPanelOpen', function () {
-      $timeout(resizeListPhotos, 200);
-    });
+    function getListPhotosToDisplay(listPhotos) {
+      var photoMargin = 4;
+      return PhotosService.getListPhotosToDisplay(listPhotos, window.innerWidth - 17, photoMargin);
+    }
 
-  });
+    function filterPhotos(listPhotos, filter) {
+      var ret = listPhotos;
+
+      if (filter) {
+        if (filter.text && filter.text.length > 0) {
+          ret = ret.filter(function (photo) {
+            return photo.path.toUpperCase().indexOf(filter.text.toUpperCase()) !== -1;
+          })
+        }
+        //if (filter) {}
+
+      }
+
+      return ret;
+    }
+
+  }
+)
+;

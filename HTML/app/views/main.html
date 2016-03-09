@@ -1,29 +1,47 @@
 <div class="mainPage" resize>
-  <div class="panel-group filter">
-    <div class="panel panel-default">
-      <div class="panel-heading" ng-click="isFilterPanelOpen = !isFilterPanelOpen">
-        <h4>Filtrer / Trier</h4>
-      </div>
-      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" ng-show="isFilterPanelOpen">
-        <div class="panel-body">
-          <div class="row">
-            <div class="col-md-6">
-              <form>
-                <input type="text" class="form-control" placeholder="Text input">
-              </form>
-            </div>
-            <div class="col-md-6">
-              <h5>Trier par :</h5>
-              Date<br/>
-              Date d'ajout
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- TODO change filter/sort do like PLEX -->
+  <div class="filter" ng-show="showFilter">
+    <div class="close" ng-click="showFilter = false">X</div>
+    <uib-tabset>
+      <uib-tab index="0" heading="Filtrer">
+        <input type="text" placeholder="Filtre" ng-model="filter.text" size="25"/>
+        <button ng-click="filter.text = ''">Effacer</button>
+      </uib-tab>
+      <uib-tab index="1" heading="Trier">
+        <p>
+          <a ng-click="sort('date')" ng-class="{bold : sortField == 'date'}">
+            <span ng-if="sortField == 'date'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
+            Date
+          </a><br/>
+          <a ng-click="sort('dateLastModified');" ng-class="{bold : sortField == 'dateLastModified'}">
+            <span ng-if="sortField == 'dateLastModified'" class="glyphicon"
+                  ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
+            Date d'ajout
+          </a><br/>
+          <a ng-click="sort('path');" ng-class="{bold : sortField == 'path'}">
+            <span ng-if="sortField == 'path'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
+            Dossier
+          </a><br/>
+          <a ng-click="sort('size');" ng-class="{bold : sortField == 'size'}">
+            <span ng-if="sortField == 'size'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
+            Taille
+          </a><br/>
+          <a ng-click="sort('width');" ng-class="{bold : sortField == 'width'}">
+            <span ng-if="sortField == 'width'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
+            Largeur
+          </a><br/>
+          <a ng-click="sort('height');" ng-class="{bold : sortField == 'height'}">
+            <span ng-if="sortField == 'height'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
+            Hauteur
+          </a><br/>
+        </p>
+      </uib-tab>
+    </uib-tabset>
   </div>
 
-
+  <div class="subMenu">
+    <a ng-click="showFilter = true">Filtrer</a> {{sort}}
+  </div>
   <div vs-repeat style="overflow: auto;"
        ng-style="{height : listPhotosDivHeight}"
        class="photosList">

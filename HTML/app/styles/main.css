@@ -9,6 +9,10 @@ body {
   padding: 0;
 }
 
+a {
+  cursor: pointer;
+}
+
 /** for uib */
 .nav, .pagination, .carousel, .panel-title a {
   cursor: pointer;
@@ -53,6 +57,12 @@ body {
   }
 }
 
+.bold {
+  font-weight: bold;
+}
+
+/** MAIN PAGE */
+
 .mainPage .photosList .line {
   text-align: justify;
   text-align-last: justify;
@@ -72,15 +82,50 @@ body {
 }
 
 .mainPage .filter {
-  margin: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #000;
+  opacity: 0.9;
+  width: 300px;
+  height: 100%;
 }
 
-.mainPage .filter .panel-heading {
-  padding-bottom: 1px;
-  padding-top: 1px;
+.mainPage .filter .close {
+  margin: 20px;
 }
 
-.mainPage .filter .panel-heading h4 {
-  padding: 0;
-  margin: 0;
+.mainPage .filter > div:last-child {
+  margin-left: 10px;
+  margin-top: 20px;
+}
+
+.mainPage .filter .tab-content > div {
+  padding-top: 20px;
+}
+
+.mainPage .filter.ng-hide-add {
+  animation: hideFilter 0.5s 1;
+}
+
+.mainPage .filter.ng-hide-remove {
+  animation: showFilter 0.5s 1;
+}
+
+@keyframes showFilter {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes hideFilter {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }

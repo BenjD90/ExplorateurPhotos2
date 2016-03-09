@@ -72,9 +72,8 @@ angular.module('htmlApp')
           return deferred.promise;
         }
       },
-      getListPhotosToDisplay: function (width, photoMargin) {
-        var ref = this;
-        var ret = ref.getListPhotos().then(function (listPhotos) {
+      getListPhotosToDisplay: function (listPhotos, width, photoMargin) {
+        var ret = listPhotos.then(function (listPhotos) {
           return transformListPhotoToBeDisplayed(listPhotos, width, photoMargin);
         });
         return ret;
