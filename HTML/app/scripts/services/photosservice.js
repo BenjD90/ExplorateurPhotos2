@@ -35,23 +35,31 @@ angular.module('htmlApp')
       };
     };
 
+    /**
+     * Can change photo.hieghtThumbnail
+     * @param listPhotos
+     * @param width
+     * @param photoMargin
+     * @returns {Array}
+     */
     var transformListPhotoToBeDisplayed = function (listPhotos, width, photoMargin) {
       var ret = [];
-      for (var i = 0; i < listPhotos.length; i++) {
+      for (var i = 0; i < listPhotos.length;) {
         var line = [];
         var sumWidth = 0;
         while (sumWidth < width && i < listPhotos.length) {
           var photo = listPhotos[i];
           if (sumWidth + photo.widthThumbnail + photoMargin <= width) {
-            line.push(photo);
-            i++;
-            sumWidth += photo.widthThumbnail + photoMargin;
           } else if (photo.widthThumbnail + photoMargin > width) {
-            i++;
-            console.error('Photo ignored');
+            var ratio = photo.heightThumbnail / photo.widthThumbnail;
+            photo.widthThumbnail = width - photoMargin;
+            photo.heightThumbnail = Math.ceil(ratio * photo.widthThumbnail);
           } else {
             break;
           }
+          sumWidth += photo.widthThumbnail + photoMargin;
+          line.push(photo);
+          i++;
         }
         ret.push(line);
         sumWidth = 0;

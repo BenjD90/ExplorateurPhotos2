@@ -41,7 +41,7 @@ public class ScanJob implements Job {
           throws JobExecutionException {
     long start = System.currentTimeMillis();
     state = (State) context.getMergedJobDataMap().get(Constants.STATE);
-    LOG.info("Start scan job " + directory);
+    LOG.info("Start scan job of directory : " + ConfigReader.getMessage(ConfigReader.KEY_PATH));
     state.setLastStart(start);
 
     File directoryFile = new File(directory);

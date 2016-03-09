@@ -63,7 +63,8 @@
        class="photosList">
     <div ng-repeat="line in listPhotosToDisplay" class="line">
       <a ng-repeat-start="photoLight in line" class="photo">
-        <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height={{Config.thumbnailsHeight}}" height="{{photoLight.heightThumbnail}}"
+        <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height={{photoLight.heightThumbnail}}"
+             height="{{photoLight.heightThumbnail}}"
              width="{{photoLight.widthThumbnail}}" title="{{photoLight | json}}"/>
       </a>
       <a ng-repeat-end></a>

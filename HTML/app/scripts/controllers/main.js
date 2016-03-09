@@ -79,9 +79,11 @@ angular.module('htmlApp')
 
       if (filter) {
         if (filter.text && filter.text.length > 0) {
-          ret = ret.filter(function (photo) {
-            return photo.path.toUpperCase().indexOf(filter.text.toUpperCase()) !== -1;
-          })
+          filter.text.split(' ').forEach(function (e) {
+            ret = ret.filter(function (photo) {
+              return photo.path.toUpperCase().indexOf(e.toUpperCase()) !== -1;
+            });
+          });
         }
         if (filter.dateStart) {
           ret = ret.filter(function (photo) {
@@ -89,8 +91,9 @@ angular.module('htmlApp')
           })
         }
         if (filter.dateEnd) {
+          var dateEnd = filter.dateEnd.getTime() + 86400000;
           ret = ret.filter(function (photo) {
-            return photo.date <= filter.dateEnd.getTime();
+            return photo.date <= dateEnd;
           })
         }
 
@@ -101,8 +104,9 @@ angular.module('htmlApp')
           })
         }
         if (filter.dateLastModifiedEnd) {
+          var dateEnd = filter.dateLastModifiedEnd.getTime() + 86400000;
           ret = ret.filter(function (photo) {
-            return photo.date <= filter.dateLastModifiedEnd.getTime();
+            return photo.date <= dateEnd;
           })
         }
       }
