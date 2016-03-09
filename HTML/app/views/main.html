@@ -27,12 +27,12 @@
         <p>
           <a ng-click="sort('date')" ng-class="{bold : sortField == 'date'}">
             <span ng-if="sortField == 'date'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
-            Date
+            Date de prise de vue
           </a><br/>
           <a ng-click="sort('dateLastModified');" ng-class="{bold : sortField == 'dateLastModified'}">
             <span ng-if="sortField == 'dateLastModified'" class="glyphicon"
                   ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
-            Date d'ajout
+            Date d'ajout (modification)
           </a><br/>
           <a ng-click="sort('path');" ng-class="{bold : sortField == 'path'}">
             <span ng-if="sortField == 'path'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
@@ -49,6 +49,11 @@
           <a ng-click="sort('height');" ng-class="{bold : sortField == 'height'}">
             <span ng-if="sortField == 'height'" class="glyphicon" ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
             Hauteur
+          </a><br/>
+          <a ng-click="sort('resolution');" ng-class="{bold : sortField == 'resolution'}">
+            <span ng-if="sortField == 'resolution'" class="glyphicon"
+                  ng-class="sortDesc ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-top'"></span>
+            Résolution
           </a><br/>
         </p>
       </uib-tab>

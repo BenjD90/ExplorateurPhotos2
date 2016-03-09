@@ -50,6 +50,7 @@ angular.module('htmlApp')
         return filterPhotos(array, newValue);
       })).then(function (array) {
         $scope.listPhotosToDisplay = array;
+        document.querySelector('.photosList').scrollTop = 0;
       });
     });
 
@@ -60,25 +61,46 @@ angular.module('htmlApp')
       }
       $scope.sortField = sortField;
       getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
-          return filterPhotos(array, $scope.filter).sort(function (a, b) {
-            if (a[sortField] < b[sortField]) {
-              return $scope.sortDesc ? 1 : -1;
-            } else if (a[sortField] > b[sortField]) {
-              return $scope.sortDesc ? -1 : 1;
-            } else {
-              if (a['path'] < b['path']) {
-                return $scope.sortDesc ? 1 : -1;
-              } else {
-                return $scope.sortDesc ? -1 : 1;
-              }
-            }
-          });
+          if (sortField !== 'resolution') {
+            return filterPhotos(array, $scope.filter).sort(function (a, b) {
+              return compareWithField(a, b, sortField);
+            });
+          } else {
+            return filterPhotos(array, $scope.filter).sort(function (a, b) {
+              return compareWithResolution(a, b, sortField);
+            });
+          }
         }
       )).
         then(function (array) {
           $scope.listPhotosToDisplay = array;
+          document.querySelector('.photosList').scrollTop = 0;
         });
     };
+
+    function compareWithField(a, b, sortField) {
+      return compareTwoFields(a[sortField], b[sortField], a, b);
+    }
+
+    function compareWithResolution(a, b) {
+      var aResolution = a.height * a.width;
+      var bResolution = b.height * b.width;
+      return compareTwoFields(aResolution, bResolution, a, b);
+    }
+
+    function compareTwoFields(fieldAValue, fieldBValue, a, b) {
+      if (fieldAValue < fieldBValue) {
+        return $scope.sortDesc ? 1 : -1;
+      } else if (fieldAValue > fieldBValue) {
+        return $scope.sortDesc ? -1 : 1;
+      } else {
+        if (a['path'] < b['path']) {
+          return $scope.sortDesc ? 1 : -1;
+        } else {
+          return $scope.sortDesc ? -1 : 1;
+        }
+      }
+    }
 
     function getListPhotosToDisplay(listPhotos) {
       var photoMargin = 4;
