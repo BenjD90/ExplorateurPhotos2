@@ -6,6 +6,22 @@
       <uib-tab index="0" heading="Filtrer">
         <input type="text" placeholder="Filtre" ng-model="filter.text" size="25"/>
         <button ng-click="filter.text = ''">Effacer</button>
+        <br/>
+        <br/>
+        Photo prise entre le :<br/>
+        <input type="date" ng-model="filter.dateStart"/><br/>
+        et le<br/>
+        <input type="date" ng-model="filter.dateEnd"/><br/>
+        <br/>
+        Photo ajoutée entre le :<br/>
+        <input type="date" ng-model="filter.dateLastModifiedStart"/><br/>
+        et le<br/>
+        <input type="date" ng-model="filter.dateLastModifiedEnd"/><br/>
+        <br/>
+        <button
+          ng-click="reset()">
+          Effacer tous les filtres
+        </button>
       </uib-tab>
       <uib-tab index="1" heading="Trier">
         <p>

@@ -21,6 +21,10 @@ angular.module('htmlApp')
     $scope.a = 5;
     $scope.time = PhotosService.time;
 
+    $scope.reset = function () {
+      $scope.filter = {};
+    };
+
     getListPhotosToDisplay(PhotosService.getListPhotos()).then(function (array) {
       $scope.listPhotosToDisplay = array;
     });
@@ -79,8 +83,28 @@ angular.module('htmlApp')
             return photo.path.toUpperCase().indexOf(filter.text.toUpperCase()) !== -1;
           })
         }
-        //if (filter) {}
+        if (filter.dateStart) {
+          ret = ret.filter(function (photo) {
+            return photo.date >= filter.dateStart.getTime();
+          })
+        }
+        if (filter.dateEnd) {
+          ret = ret.filter(function (photo) {
+            return photo.date <= filter.dateEnd.getTime();
+          })
+        }
 
+
+        if (filter.dateLastModifiedStart) {
+          ret = ret.filter(function (photo) {
+            return photo.date >= filter.dateLastModifiedStart.getTime();
+          })
+        }
+        if (filter.dateLastModifiedEnd) {
+          ret = ret.filter(function (photo) {
+            return photo.date <= filter.dateLastModifiedEnd.getTime();
+          })
+        }
       }
 
       return ret;
