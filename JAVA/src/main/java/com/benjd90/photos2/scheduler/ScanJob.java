@@ -32,7 +32,7 @@ import java.util.List;
 public class ScanJob implements Job {
   private static final Logger LOG = LoggerFactory.getLogger(ScanJob.class);
 
-  private final String directory = ConfigReader.getMessage(ConfigReader.KEY_APP_DIR);
+  private final String appDirectory = ConfigReader.getMessage(ConfigReader.KEY_APP_DIR);
   private String isRunningFileName = "isRunning.txt";
   private String listFilesFileName = ConfigReader.getMessage(ConfigReader.KEY_FILENAME_LIST_PHOTOS);
   private State state;
@@ -41,25 +41,25 @@ public class ScanJob implements Job {
           throws JobExecutionException {
     long start = System.currentTimeMillis();
     state = (State) context.getMergedJobDataMap().get(Constants.STATE);
-    LOG.info("Start scan job of directory : " + ConfigReader.getMessage(ConfigReader.KEY_PATH));
+    LOG.info("Start scan job of appDirectory : " + ConfigReader.getMessage(ConfigReader.KEY_PATH));
     state.setLastStart(start);
 
-    File directoryFile = new File(directory);
+    File directoryFile = new File(appDirectory);
     if (!directoryFile.exists()) {
       directoryFile.mkdir();
     }
 
-    File isRunningToken = new File(directory, isRunningFileName);
+    File isRunningToken = new File(appDirectory, isRunningFileName);
     if (!isRunningToken.exists()) {
       try {
-        LOG.info("Scan START " + directory);
+        LOG.info("Scan START " + appDirectory);
         launchScan();
         runScan();
-        LOG.info("Scan END OK" + directory);
+        LOG.info("Scan END OK" + appDirectory);
         endScan();
       } catch (IOException e) {
         LOG.error("IO Error while scanning", e);
-        LOG.info("Scan END KO" + directory);
+        LOG.info("Scan END KO" + appDirectory);
         state.setLastRunEndState(Constants.KO);
         try {
           PrintWriter writer = new PrintWriter(new FileOutputStream(new File(isRunningFileName)), true);
@@ -76,7 +76,7 @@ public class ScanJob implements Job {
     state.setLastEnd(System.currentTimeMillis());
     state.setLastRunEndState(Constants.OK);
 
-    LOG.info("End scan job in " + TimeUtils.getTime(start) + ". " + directory);
+    LOG.info("End scan job in " + TimeUtils.getTime(start) + ". " + appDirectory);
   }
 
   private synchronized void runScan() throws IOException {
@@ -88,8 +88,8 @@ public class ScanJob implements Job {
     Collections.sort(photos, new PhotoLightDefaultComparator());
     objectToStore.setPhotos(photos);
 
-    File outTempFile = new File(directory, listFilesFileName + ".tmp");
-    File outFile = new File(directory, listFilesFileName);
+    File outTempFile = new File(appDirectory, listFilesFileName + ".tmp");
+    File outFile = new File(appDirectory, listFilesFileName);
     mapper.writeValue(outTempFile, objectToStore);
     if (outFile.delete()) {
       if (!outTempFile.renameTo(outFile)) {
@@ -111,7 +111,7 @@ public class ScanJob implements Job {
 
 
   private void createRunningFile() throws IOException {
-    File fileToCreate = new File(directory, isRunningFileName);
+    File fileToCreate = new File(appDirectory, isRunningFileName);
     if (!fileToCreate.exists()) {
       LOG.info("Create file " + fileToCreate.getAbsolutePath());
       PrintWriter writer = new PrintWriter(fileToCreate, CharEncoding.UTF_8);
@@ -121,7 +121,7 @@ public class ScanJob implements Job {
   }
 
   private void deleteRunningFile() throws FileNotFoundException {
-    File fileToDelete = new File(directory, isRunningFileName);
+    File fileToDelete = new File(appDirectory, isRunningFileName);
     if (fileToDelete.exists()) {
       LOG.info("Delete file " + fileToDelete.getAbsolutePath());
       fileToDelete.delete();

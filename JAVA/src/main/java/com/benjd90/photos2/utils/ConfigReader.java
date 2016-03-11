@@ -15,6 +15,7 @@ public class ConfigReader {
 
   public static final String KEY_PATH = "path";
   public static final String KEY_APP_DIR = "appFilesDir";
+  public static final String KEY_CACHE_DIR = "cacheDir";
   public static final String KEY_PHOTOS_EXTENSION = "photosExtensions";
   public static final String KEY_FILENAME_LIST_PHOTOS = "listPhotosFileName";
 
