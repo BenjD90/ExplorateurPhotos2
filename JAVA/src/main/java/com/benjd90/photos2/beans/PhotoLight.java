@@ -35,4 +35,7 @@ public class PhotoLight extends FileLight {
   public void setDateLastModified(Date dateLastModified) {
     this.dateLastModified = dateLastModified;
   }
+
+
+
 }

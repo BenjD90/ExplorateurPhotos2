@@ -8,6 +8,7 @@ public class State {
   private long lastEnd;
   private long lastStart;
   private String lastRunEndState;
+  private String step;
 
   public void setActualPath(String actualPath) {
     this.actualPath = actualPath;
@@ -39,5 +40,13 @@ public class State {
 
   public String getLastRunEndState() {
     return lastRunEndState;
+  }
+
+  public String getStep() {
+    return step;
+  }
+
+  public void setStep(String step) {
+    this.step = step;
   }
 }

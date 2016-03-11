@@ -18,6 +18,7 @@ public class ConfigReader {
   public static final String KEY_CACHE_DIR = "cacheDir";
   public static final String KEY_PHOTOS_EXTENSION = "photosExtensions";
   public static final String KEY_FILENAME_LIST_PHOTOS = "listPhotosFileName";
+  public static final String KEY_THUMBNAIL_HEIGHT = "thumbnailHeight";
 
   /**
    * LOGGER For the class.
@@ -31,6 +32,7 @@ public class ConfigReader {
   private static final java.util.Properties PROPS = new java.util.Properties();
 
   private static final String PROPERTIES_FILE = "config.properties";
+  public static final String KEY_IS_RUNNING_FILE_NAME = "isRunningFileName";
 
 
   static {
