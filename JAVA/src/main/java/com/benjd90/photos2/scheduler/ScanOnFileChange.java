@@ -3,6 +3,7 @@ package com.benjd90.photos2.scheduler;
 import com.benjd90.photos2.beans.FileChangeEvent;
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.beans.PhotosListStorage;
+import com.benjd90.photos2.beans.comparator.PhotoLightDefaultComparator;
 import com.benjd90.photos2.utils.ConfigReader;
 import com.benjd90.photos2.utils.PhotosUtils;
 import com.benjd90.photos2.utils.SchedulerUtils;
@@ -98,11 +99,32 @@ public class ScanOnFileChange {
     List<PhotoLight> photos = objectStored.getPhotos();
 
     photos = removeAllFilesFromIndex(filesToDelete, photos);
-    photos = addAllFilesToIndex(filesToAdd, photos);
+    addAllFilesToIndex(filesToAdd, photos);
 
-    //TODO add remove and add for cache
+    Integer thumbnailHeight = Integer.valueOf(ConfigReader.getMessage(ConfigReader.KEY_THUMBNAIL_HEIGHT));
+    removeAllThumbnails(filesToDelete, thumbnailHeight);
+    addAllThumbnails(filesToDelete, thumbnailHeight);
+
+    Collections.sort(photos, new PhotoLightDefaultComparator());
+
     objectStored.setDateScan(new Date());
     SchedulerUtils.storeScanResultToFile(objectStored, appDirectory, listFilesFileName);
+  }
+
+  private void removeAllThumbnails(Set<File> filesToDelete, Integer thumbnailHeight) throws IOException {
+    for (File photoOriginal : filesToDelete) {
+      Path thumbnailPath = PhotosUtils.getThumbnailPath(null, thumbnailHeight, photoOriginal);
+      if (!thumbnailPath.toFile().delete()) {
+        throw new IOException("Can't delete thumbnail : " + thumbnailPath);
+      }
+    }
+  }
+
+  private void addAllThumbnails(Set<File> filesToDelete, Integer thumbnailHeight) throws IOException {
+    for (File photoOriginal : filesToDelete) {
+      File thumbnailCacheFile = PhotosUtils.getThumbnailPath(null, thumbnailHeight, photoOriginal).toFile();
+      PhotosUtils.createCacheThumbnail(null, thumbnailHeight, photoOriginal, thumbnailCacheFile);
+    }
   }
 
   private List<PhotoLight> removeAllFilesFromIndex(Set<File> filesToDelete, List<PhotoLight> photos) {
