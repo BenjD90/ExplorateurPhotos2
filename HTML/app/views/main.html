@@ -18,6 +18,11 @@
         et le<br/>
         <input type="date" ng-model="filter.dateLastModifiedEnd"/><br/>
         <br/>
+        Résolution comprise entre :<br/>
+        <input type="number" style="width:50px;" ng-model="filter.resolutionMin"/>
+        et
+        <input type="number" style="width:50px;" ng-model="filter.resolutionMax"/> Mpx<br/>
+        <br/>
         <button
           ng-click="reset()">
           Effacer tous les filtres

@@ -142,6 +142,17 @@ angular.module('htmlApp')
             return photo.date <= dateEnd;
           })
         }
+
+        if (filter.resolutionMin) {
+          ret = ret.filter(function (photo) {
+            return photo.width * photo.height >= filter.resolutionMin * 1000000;
+          })
+        }
+        if (filter.resolutionMax) {
+          ret = ret.filter(function (photo) {
+            return photo.width * photo.height <= filter.resolutionMax * 1000000;
+          })
+        }
       }
 
       return ret;
