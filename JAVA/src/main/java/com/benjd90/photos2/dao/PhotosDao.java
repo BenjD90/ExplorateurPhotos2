@@ -36,6 +36,7 @@ public class PhotosDao implements IPhotosDao {
         return PhotosUtils.createCacheThumbnail(width, height, photoOriginal, thumbnailCacheFile);
       }
     } else {
+      LOG.warn("Photo doesn't exist : " + path);
       return null;
     }
   }

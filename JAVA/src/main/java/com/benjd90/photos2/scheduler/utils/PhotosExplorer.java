@@ -7,11 +7,11 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -85,17 +85,35 @@ public class PhotosExplorer {
                 && exifDirectory.containsTag(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT)) {
           int width, height;
           try {
-            width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
-            height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+            Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+            if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+              int orientation = exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+              switch (orientation) {
+                case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
+                case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
+                  //swap
+                  width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+                  height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+                  break;
+                case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
+                case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
+                default:
+                  width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+                  height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+              }
+            } else {
+              width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+              height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+            }
           } catch (MetadataException e) {
             //try to read height and width java buffered images
-            BufferedImage img = ImageIO.read(file);
+            BufferedImage img = PhotosUtils.readPhoto(file);
             width = img.getWidth();
             height = img.getHeight();
           }
           return new Dimension(width, height);
         } else {
-          BufferedImage img = ImageIO.read(file);
+          BufferedImage img = PhotosUtils.readPhoto(file);
           return new Dimension(img.getWidth(), img.getHeight());
         }
       } catch (ImageProcessingException e) {

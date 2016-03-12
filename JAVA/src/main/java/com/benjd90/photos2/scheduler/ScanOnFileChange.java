@@ -114,7 +114,7 @@ public class ScanOnFileChange {
   private void removeAllThumbnails(Set<File> filesToDelete, Integer thumbnailHeight) throws IOException {
     for (File photoOriginal : filesToDelete) {
       Path thumbnailPath = PhotosUtils.getThumbnailPath(null, thumbnailHeight, photoOriginal);
-      if (!thumbnailPath.toFile().delete()) {
+      if (thumbnailPath.toFile().exists() && !thumbnailPath.toFile().delete()) {
         throw new IOException("Can't delete thumbnail : " + thumbnailPath);
       }
     }

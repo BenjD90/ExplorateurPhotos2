@@ -2,6 +2,12 @@ package com.benjd90.photos2.utils;
 
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,6 +19,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,7 +62,7 @@ public class PhotosUtils {
       }
     }
 
-    BufferedImage originalImage = ImageIO.read(photoOriginal);
+    BufferedImage originalImage = PhotosUtils.readPhoto(photoOriginal);
 
     int widthOriginal = originalImage.getWidth();
     int heightOriginal = originalImage.getHeight();
@@ -71,6 +78,64 @@ public class PhotosUtils {
 
     storeBufferedImage(resizedImageHintJpg, thumbnailCacheFile);
     return Files.readAllBytes(thumbnailCacheFile.toPath());
+  }
+
+  public static BufferedImage readPhoto(File file) throws IOException {
+    BufferedImage originalImage = ImageIO.read(file);
+    try {
+      Metadata metadata = ImageMetadataReader.readMetadata(file);
+      Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+      if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+        int orientation;
+        orientation = exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+
+        AffineTransform tx = new AffineTransform();
+        double angleRotation = 0;
+        switch (orientation) {
+          case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
+            return originalImage;
+          case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
+            LOG.debug("Rotate 90");
+            angleRotation = Math.toRadians(90);
+            break;
+          case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
+            LOG.debug("Rotate 180");
+            angleRotation = Math.toRadians(180);
+            break;
+          case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
+            LOG.debug("Rotate 270");
+            angleRotation = Math.toRadians(270);
+            break;
+          default:
+            return originalImage;
+        }
+        return rotate(originalImage, angleRotation);
+      } else {
+        return originalImage;
+      }
+    } catch (ImageProcessingException e) {
+      LOG.error("Can't read photo exif", e);
+    } catch (MetadataException e) {
+      LOG.error("Can't read photo Metadata", e);
+    }
+    return originalImage;
+  }
+
+
+  private static BufferedImage rotate(BufferedImage image, double angle) {
+    double sin = Math.abs(Math.sin(angle));
+    double cos = Math.abs(Math.cos(angle));
+    int width = image.getWidth();
+    int height = image.getHeight();
+    int newWidth = (int) Math.floor(width * cos + height * sin);
+    int newHeight = (int) Math.floor(height * cos + width * sin);
+    BufferedImage result = new BufferedImage(newWidth, newHeight, image.getType());
+    Graphics2D g = result.createGraphics();
+    g.translate((newWidth - width) / 2, (newHeight - height) / 2);
+    g.rotate(angle, width / 2, height / 2);
+    g.drawRenderedImage(image, null);
+    g.dispose();
+    return result;
   }
 
   private static void storeBufferedImage(BufferedImage resizedImageHintJpg, File thumbnailCacheFile) throws IOException {
