@@ -18,7 +18,8 @@ angular
     'ngSanitize',
     'ngTouch',
     'vs-repeat',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'snap'
   ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -35,4 +36,7 @@ angular
       .otherwise({
         redirectTo: '/'
       });
+  })
+  .config(function (snapRemoteProvider) {
+    snapRemoteProvider.globalOptions.touchToDrag = false;
   });

@@ -61,6 +61,10 @@ a {
   font-weight: bold;
 }
 
+snap-content {
+  background-color: #000;
+}
+
 /** MAIN PAGE */
 
 .mainPage .photosList .line {
@@ -83,6 +87,7 @@ a {
 
 .mainPage .filter {
   position: fixed;
+  z-index: 10;
   top: 0;
   left: 0;
   background-color: #000;

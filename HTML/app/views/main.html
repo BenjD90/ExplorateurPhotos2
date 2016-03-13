@@ -65,9 +65,13 @@
     </uib-tabset>
   </div>
 
-  <div class="subMenu">
-    <a ng-click="showFilter = true">Filtrer</a> {{sort}}
-  </div>
+  <nav class="navbar navbar-default subMenu">
+    <ul class="nav navbar-nav">
+      <li class="active"><a snap-toggle="left">Menu</a></li>
+      <li><a ng-click="showFilter = true">Filtrer</a></li>
+    </ul>
+  </nav>
+
   <div vs-repeat style="overflow: auto;"
        ng-style="{height : listPhotosDivHeight}"
        class="photosList">
