@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -21,9 +22,7 @@ import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,15 +54,30 @@ public class PhotosUtils {
     return resizedImage;
   }
 
-  public static synchronized byte[] createCacheThumbnail(Integer width, Integer height, File photoOriginal, File thumbnailCacheFile) throws IOException {
-    if (!thumbnailCacheFile.getParentFile().exists()) {
+
+  /**
+   * @param width
+   * @param height
+   * @param photoOriginal
+   * @param thumbnailCacheFile if null, image is not stored
+   * @return
+   * @throws IOException
+   */
+  public static synchronized
+  @Nullable
+  byte[] createCacheThumbnail(Integer width, Integer height, File photoOriginal, @Nullable File thumbnailCacheFile) throws IOException {
+    if (thumbnailCacheFile != null && !thumbnailCacheFile.getParentFile().exists()) {
       if (!thumbnailCacheFile.getParentFile().mkdirs()) {
         throw new IOException("Can't create cache directories" + thumbnailCacheFile.getParentFile());
       }
     }
-
-    BufferedImage originalImage = PhotosUtils.readPhoto(photoOriginal);
-
+    BufferedImage originalImage = null;
+    try {
+      originalImage = PhotosUtils.readPhoto(photoOriginal);
+    } catch (IOException e) {
+      LOG.error("Can't read input file " + photoOriginal.getAbsolutePath(), e);
+      return null;
+    }
     int widthOriginal = originalImage.getWidth();
     int heightOriginal = originalImage.getHeight();
     float ratio = ((float) widthOriginal) / heightOriginal;
@@ -74,11 +88,16 @@ public class PhotosUtils {
       width = (int) (height * ratio);
     }
 
-    BufferedImage resizedImageHintJpg = resizeImage(originalImage, width, height);
+    BufferedImage resizedImage = resizeImage(originalImage, width, height);
 
-    storeBufferedImage(resizedImageHintJpg, thumbnailCacheFile);
-    return Files.readAllBytes(thumbnailCacheFile.toPath());
+    if (thumbnailCacheFile != null) {
+      storeBufferedImage(resizedImage, thumbnailCacheFile);
+      return Files.readAllBytes(thumbnailCacheFile.toPath());
+    } else {
+      return getBufferedImageBytes(resizedImage);
+    }
   }
+
 
   public static BufferedImage readPhoto(File file) throws IOException {
     BufferedImage originalImage = ImageIO.read(file);
@@ -139,16 +158,34 @@ public class PhotosUtils {
   }
 
   private static void storeBufferedImage(BufferedImage resizedImageHintJpg, File thumbnailCacheFile) throws IOException {
+    FileOutputStream outputStream = new FileOutputStream(thumbnailCacheFile);
+    wirteImgaeToOutputStream(resizedImageHintJpg, outputStream);
+    outputStream.close();
+  }
+
+  private static OutputStream wirteImgaeToOutputStream(BufferedImage resizedImageHintJpg, OutputStream outputStream) throws IOException {
+    final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+    writer.setOutput(ImageIO.createImageOutputStream(outputStream));
+    writer.write(null, new IIOImage(resizedImageHintJpg, null, null), getJpegWriteParam());
+    return outputStream;
+  }
+
+  private static byte[] getBufferedImageBytes(BufferedImage resizedImageHintJpg) throws IOException {
+    JPEGImageWriteParam jpegParams = getJpegWriteParam();
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    wirteImgaeToOutputStream(resizedImageHintJpg, outputStream);
+
+    byte[] imageInByte = outputStream.toByteArray();
+    outputStream.close();
+    return imageInByte;
+  }
+
+  private static JPEGImageWriteParam getJpegWriteParam() {
     JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
     jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-    jpegParams.setCompressionQuality(0.5f);
-
-
-    final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-    FileOutputStream outputStream = new FileOutputStream(thumbnailCacheFile);
-    writer.setOutput(ImageIO.createImageOutputStream(outputStream));
-    writer.write(null, new IIOImage(resizedImageHintJpg, null, null), jpegParams);
-    outputStream.close();
+    jpegParams.setCompressionQuality(0.4f);
+    return jpegParams;
   }
 
   public static Path getThumbnailPath(Integer width, Integer height, File photoOriginal) {

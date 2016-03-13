@@ -1,6 +1,7 @@
 package com.benjd90.photos2.controller;
 
 import com.benjd90.photos2.beans.State;
+import com.benjd90.photos2.scheduler.ScanJob;
 import com.benjd90.photos2.scheduler.ScanScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,13 @@ public class SchecdulerController {
   @ResponseBody
   public State state() throws IOException {
     return scanScheduler.getState();
+  }
+
+  @RequestMapping(value = "/launchScan", method = RequestMethod.GET)
+  @ResponseBody
+  public void launchScan() throws IOException {
+    ScanJob scanJob = new ScanJob();
+    scanJob.run(scanScheduler.getState());
   }
 
 }

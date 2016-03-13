@@ -2,12 +2,19 @@
   <nav class="navbar navbar-default">
     <ul class="nav navbar-nav">
       <li class="active"><a snap-toggle="left">Menu</a></li>
+      <li><a ng-click="launchScan()">Lancer une demande de scan</a></li>
+
     </ul>
   </nav>
+
+
   Information à propos du scan :<br/>
   Dernier fichier scanné : {{state.actualPath}}<br/>
   Etape : {{state.step}}<br/>
   Dernier scan terminé le <span ng-if="state.lastEnd">{{state.lastEnd | date:'dd/MM/yyyy HH:mm:ss'}}</span><br/>
   Dernier scan démarré le {{state.lastStart | date:'dd/MM/yyyy HH:mm:ss'}}<br/>
   Dernier état de scan terminé : {{state.lastRunEndState}}<br/>
+
+
+  <div>{{errorLaunchScan}}</div>
 </div>

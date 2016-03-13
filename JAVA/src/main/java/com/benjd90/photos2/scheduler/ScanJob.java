@@ -35,8 +35,13 @@ public class ScanJob implements Job {
 
   public void execute(JobExecutionContext context)
           throws JobExecutionException {
+    State state = (State) context.getMergedJobDataMap().get(Constants.STATE);
+    run(state);
+  }
+
+  public void run(State state) {
+    this.state = state;
     long start = System.currentTimeMillis();
-    state = (State) context.getMergedJobDataMap().get(Constants.STATE);
     LOG.info("Start scan job of appDirectory : " + ConfigReader.getMessage(ConfigReader.KEY_PATH));
     state.setLastStart(start);
     state.setStep("INIT");
@@ -59,9 +64,10 @@ public class ScanJob implements Job {
         runScan();
         LOG.info("Scan END OK" + appDirectory);
         endScan();
+        state.setLastRunEndState(Constants.OK);
       } catch (IOException e) {
         LOG.error("IO Error while scanning", e);
-        LOG.info("Scan END KO" + appDirectory);
+        LOG.info("Scan END KO " + appDirectory);
         state.setLastRunEndState(Constants.KO);
         state.setStep("");
         try {
@@ -77,7 +83,6 @@ public class ScanJob implements Job {
 
     state.setActualPath(Constants.EMPTY_STRING);
     state.setLastEnd(System.currentTimeMillis());
-    state.setLastRunEndState(Constants.OK);
     state.setStep("DONE");
 
     LOG.info("End scan job in " + TimeUtils.getTime(start) + ". " + appDirectory);

@@ -51,42 +51,46 @@ public class ScanOnFileChange {
     File isRunningToken = new File(appDirectory, isRunningFileName);
     try {
       while (true) {
-        int size = filesToTreat.size();
-        if (size > 0 && !isRunningToken.exists()) {
-          startUpdateScan();
-          Set<File> filesToDelete = new HashSet<>();
-          Set<File> filesToAdd = new HashSet<>();
+        try {
+          int size = filesToTreat.size();
+          if (size > 0 && !isRunningToken.exists()) {
+            startUpdateScan();
+            LOG.info("Debut de traitement des modifications locales");
+            Set<File> filesToDelete = new HashSet<>();
+            Set<File> filesToAdd = new HashSet<>();
 
-          // treat "size" elements
-          for (int i = 0; i < size; i++) {
-            FileChangeEvent fileChanged = filesToTreat.get(i);
+            // treat "size" elements
+            for (int i = 0; i < size; i++) {
+              FileChangeEvent fileChanged = filesToTreat.get(i);
 
-            if (fileChanged.getKind() == StandardWatchEventKinds.ENTRY_CREATE) {
-              LOG.info("fichier ajoute " + fileChanged.getFile().getAbsolutePath());
-              filesToAdd.add(fileChanged.getFile());
-            } else if (fileChanged.getKind() == StandardWatchEventKinds.ENTRY_DELETE) {
-              LOG.info("fichier supprime " + fileChanged.getFile().getAbsolutePath());
-              filesToDelete.add(fileChanged.getFile());
-            } else { // if (fileChanged.getKind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-              LOG.info("fichier modifie" + fileChanged.getFile().getAbsolutePath());
-              filesToAdd.add(fileChanged.getFile());
-              filesToDelete.add(fileChanged.getFile());
+              if (fileChanged.getKind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                LOG.info("fichier ajoute " + fileChanged.getFile().getAbsolutePath());
+                filesToAdd.add(fileChanged.getFile());
+              } else if (fileChanged.getKind() == StandardWatchEventKinds.ENTRY_DELETE) {
+                LOG.info("fichier supprime " + fileChanged.getFile().getAbsolutePath());
+                filesToDelete.add(fileChanged.getFile());
+              } else { // if (fileChanged.getKind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+                LOG.info("fichier modifie" + fileChanged.getFile().getAbsolutePath());
+                filesToAdd.add(fileChanged.getFile());
+                filesToDelete.add(fileChanged.getFile());
+              }
             }
+
+            // remove treated elements
+            for (int i = 0; i < size; i++) {
+              filesToTreat.removeFirst();
+            }
+
+            addAndRemoveFiles(filesToAdd, filesToDelete);
+
+            LOG.info("Fin de traitement des modifications locales");
+            endUpdateScan();
           }
-
-          // remove treated elements
-          for (int i = 0; i < size; i++) {
-            filesToTreat.removeFirst();
-          }
-
-          addAndRemoveFiles(filesToAdd, filesToDelete);
-
-          endUpdateScan();
+          Thread.sleep(500);
+        } catch (IOException e) {
+          LOG.error("Can't update list", e);
         }
-        Thread.sleep(500);
       }
-    } catch (IOException e) {
-      LOG.error("Can't update list", e);
     } catch (InterruptedException e) {
       LOG.error("Can't update list", e);
     }
@@ -103,7 +107,7 @@ public class ScanOnFileChange {
 
     Integer thumbnailHeight = Integer.valueOf(ConfigReader.getMessage(ConfigReader.KEY_THUMBNAIL_HEIGHT));
     removeAllThumbnails(filesToDelete, thumbnailHeight);
-    addAllThumbnails(filesToDelete, thumbnailHeight);
+    addAllThumbnails(filesToAdd, thumbnailHeight);
 
     Collections.sort(photos, new PhotoLightDefaultComparator());
 

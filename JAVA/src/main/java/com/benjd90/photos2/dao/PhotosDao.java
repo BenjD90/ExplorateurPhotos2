@@ -1,5 +1,6 @@
 package com.benjd90.photos2.dao;
 
+import com.benjd90.photos2.utils.ConfigReader;
 import com.benjd90.photos2.utils.PhotosUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,15 +26,17 @@ public class PhotosDao implements IPhotosDao {
 
       if (width == null && height == null) { // return original photo
         return Files.readAllBytes(photoOriginal.toPath());
-      }
+      } else if (height != null && width == null && height.equals(Integer.valueOf(ConfigReader.getMessage(ConfigReader.KEY_THUMBNAIL_HEIGHT)))) {
+        Path thumbnailPath = PhotosUtils.getThumbnailPath(width, height, photoOriginal);
+        File thumbnailCacheFile = thumbnailPath.toFile();
 
-      Path thumbnailPath = PhotosUtils.getThumbnailPath(width, height, photoOriginal);
-      File thumbnailCacheFile = thumbnailPath.toFile();
-
-      if (thumbnailCacheFile.exists()) {
-        return Files.readAllBytes(thumbnailPath);
+        if (thumbnailCacheFile.exists()) {
+          return Files.readAllBytes(thumbnailPath);
+        } else {
+          return PhotosUtils.createCacheThumbnail(width, height, photoOriginal, thumbnailCacheFile);
+        }
       } else {
-        return PhotosUtils.createCacheThumbnail(width, height, photoOriginal, thumbnailCacheFile);
+        return PhotosUtils.createCacheThumbnail(width, height, photoOriginal, null);
       }
     } else {
       LOG.warn("Photo doesn't exist : " + path);

@@ -21,4 +21,10 @@ angular.module('htmlApp')
         $interval.cancel(intervalPromise);
     });
 
+
+    $scope.launchScan = function () {
+      $http.get(Config.urlServices + '/launchScan').catch(function () {
+        $scope.errorLaunchScan = "Error";
+      });
+    }
   });
