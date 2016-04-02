@@ -33,8 +33,13 @@ public class SchecdulerController {
   @RequestMapping(value = "/launchScan", method = RequestMethod.GET)
   @ResponseBody
   public void launchScan() throws IOException {
-    ScanJob scanJob = new ScanJob();
-    scanJob.run(scanScheduler.getState());
+    new Thread() {
+      @Override
+      public void run() {
+        ScanJob scanJob = new ScanJob();
+        scanJob.run(scanScheduler.getState());
+      }
+    }.start();
   }
 
 }
