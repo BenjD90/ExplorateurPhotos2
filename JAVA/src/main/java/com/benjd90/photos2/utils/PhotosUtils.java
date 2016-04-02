@@ -4,6 +4,7 @@ import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
+import com.drew.lang.annotations.NotNull;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
@@ -193,7 +194,7 @@ public class PhotosUtils {
     return Paths.get(ConfigReader.getMessage(ConfigReader.KEY_APP_DIR), ConfigReader.getMessage(ConfigReader.KEY_CACHE_DIR), width + "x" + height, pathToPhotoInPhotosLibrary);
   }
 
-  public static PhotoLight getPhotoLightFromFile(File file) throws IOException {
+  public static PhotoLight getPhotoLightFromFile(@NotNull File file, @Nullable Date date) throws IOException {
     PhotoLight photoLight = new PhotoLight();
     photoLight.setPath(file.getPath());
     photoLight.setSize(file.length());
@@ -203,6 +204,7 @@ public class PhotosUtils {
     Dimension photoDimensions = PhotosExplorer.getDimensions(file);
     photoLight.setHeight((long) photoDimensions.getHeight());
     photoLight.setWidth((long) photoDimensions.getWidth());
+    photoLight.setSelected(date);
     return photoLight;
   }
 }

@@ -143,7 +143,8 @@ public class ScanOnFileChange {
   private List<PhotoLight> addAllFilesToIndex(Set<File> filesToAdd, List<PhotoLight> photos) throws IOException {
     for (File file : filesToAdd) {
       if (PhotosUtils.isPhoto(file)) {
-        PhotoLight photoToAdd = PhotosUtils.getPhotoLightFromFile(file);
+        // a photo can't be already selected when added on live
+        PhotoLight photoToAdd = PhotosUtils.getPhotoLightFromFile(file, null);
         photos.add(photoToAdd);
       }
     }

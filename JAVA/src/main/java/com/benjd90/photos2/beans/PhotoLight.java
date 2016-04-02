@@ -11,6 +11,7 @@ public class PhotoLight extends FileLight {
   private Date dateLastModified;
   private long height;
   private long width;
+  private Date selected;
 
   public long getHeight() {
     return height;
@@ -37,5 +38,11 @@ public class PhotoLight extends FileLight {
   }
 
 
+  public Date getSelected() {
+    return selected;
+  }
 
+  public void setSelected(Date selected) {
+    this.selected = selected;
+  }
 }

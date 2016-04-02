@@ -7,6 +7,8 @@ import com.benjd90.photos2.beans.State;
 import com.benjd90.photos2.beans.comparator.PhotoLightDefaultComparator;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
 import com.benjd90.photos2.utils.*;
+import org.ini4j.Ini;
+import org.ini4j.Profile;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -15,10 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Job that write the file : listPhotos.json
@@ -27,6 +27,8 @@ import java.util.List;
 //TODO add scan on file change https://docs.oracle.com/javase/tutorial/essential/io/notification.html
 public class ScanJob implements Job {
   private static final Logger LOG = LoggerFactory.getLogger(ScanJob.class);
+  public static final String PICASA_INI = ".picasa.ini";
+  private static final String YES = "\"yes\"";
 
   private final String appDirectory = ConfigReader.getMessage(ConfigReader.KEY_APP_DIR);
   private final String isRunningFileName = ConfigReader.getMessage(ConfigReader.KEY_IS_RUNNING_FILE_NAME);
@@ -129,15 +131,22 @@ public class ScanJob implements Job {
   }
 
 
-  private List<PhotoLight> getListOfPhotos(String path) throws IOException {
-    File directory = new File(path);
+  private List<PhotoLight> getListOfPhotos(String directoryPath) throws IOException {
+    File directory = new File(directoryPath);
     File[] list = directory.listFiles();
     List<PhotoLight> ret = new ArrayList<>();
+
+
+    HashMap<String, Date> selectedPhotosInDirectory = new HashMap<>();
+    if (isTherePicasaIniHere(list)) {
+      selectedPhotosInDirectory.putAll(readPicasaIniFile(Paths.get(directoryPath, PICASA_INI)));
+    }
 
     if (list != null) {
       for (File file : list) {
         this.state.setActualPath(file.getAbsolutePath());
-        PhotoLight photoLight = PhotosUtils.getPhotoLightFromFile(file);
+        // add all, even directories
+        PhotoLight photoLight = PhotosUtils.getPhotoLightFromFile(file, selectedPhotosInDirectory.get(file.getName()));
         ret.add(photoLight);
       }
     }
@@ -160,4 +169,38 @@ public class ScanJob implements Job {
     return ret;
   }
 
+  private boolean isTherePicasaIniHere(File[] files) {
+    for (File file : files) {
+      if (file.getName().equals(PICASA_INI)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private HashMap<String, Date> readPicasaIniFile(Path path) throws IOException {
+    Ini ini = new Ini(path.toFile());
+    HashMap<String, Date> ret = new HashMap<>();
+    for (String sectionName : ini.keySet()) {
+      Profile.Section section = ini.get(sectionName);
+
+      String date = null;
+      String star = section.get("star");
+      String starred = section.get("stared");
+      if (star != null) {
+        date = star;
+      } else if (starred != null) {
+        date = starred;
+      }
+
+      if (date != null) {
+        if (date.equals(YES)) {
+          ret.put(sectionName, new Date(0));
+        } else {
+          ret.put(sectionName, new Date(Long.valueOf(date) * 1000));
+        }
+      }
+    }
+    return ret;
+  }
 }
