@@ -1,40 +1,49 @@
-<div class="modal-header">
-  <h4 class="modal-title">{{photo.path | getFileNameFromPath}}</h4>
-</div>
-<div class="modal-body" id="photoDisplayArea" style="text-align: center;">
-  <a ng-href="{{urlThumbnail}}?path={{photo.path | urlEncode}}" target="_blank">
-    <img ng-src="{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{height}}&&width={{width}}"
-         height="{{height}}"
-         width="{{width}}"
-         style="background-image: url('{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{photo.heightThumbnail}}'); background-size: 100% 100%;"
-      />
-  </a>
-</div>
-<div class="modal-footer" style="text-align: left;">
-  <div class="row">
-    <div class="col-md-6">
-      <dl>
-        <dt>Path</dt>
-        <dd>{{photo.path}}</dd>
-        <dt>Largeur</dt>
-        <dd>{{photo.width}} px</dd>
-        <dt>Hauteur</dt>
-        <dd>{{photo.height}} px</dd>
-        <dt>Ratio</dt>
-        <dd>{{photo.width / photo.height | number:2}}</dd>
-      </dl>
-    </div>
-    <div class="col-md-6">
-      <dl>
-        <dt>Résolution</dt>
-        <dd>{{photo.width * photo.height | pxPhotoFormatNumber}}</dd>
-        <dt>Date de prise de vue</dt>
-        <dd>{{photo.date | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
-        <dt>Date de modification</dt>
-        <dd>{{photo.dateLastModified | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
-        <dt>Taille</dt>
-        <dd>{{photo.size | fileSizeFormat}}</dd>
-      </dl>
+<div class="modal-photo">
+  <div class="modal-header">
+    <h4 class="modal-title">{{photo.path | getFileNameFromPath}} {{photo.selected}}
+      <span ng-show="photo.selected !== null" class="selected">★</span>
+    </h4>
+  </div>
+  <div class="modal-body" id="photoDisplayArea" style="text-align: center;">
+    <a ng-href="{{urlThumbnail}}?path={{photo.path | urlEncode}}" target="_blank">
+      <img ng-src="{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{height}}&&width={{width}}"
+           height="{{height}}"
+           width="{{width}}"
+           style="background-image: url('{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{photo.heightThumbnail}}'); background-size: 100% 100%;"
+        />
+    </a>
+  </div>
+  <div class="modal-footer" style="text-align: left;">
+    <div class="row">
+      <div class="col-md-6">
+        <dl>
+          <dt>Path</dt>
+          <dd>{{photo.path}}</dd>
+          <dt>Largeur</dt>
+          <dd>{{photo.width}} px</dd>
+          <dt>Hauteur</dt>
+          <dd>{{photo.height}} px</dd>
+          <dt>Ratio</dt>
+          <dd>{{photo.width / photo.height | number:2}}</dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl>
+          <dt>Résolution</dt>
+          <dd>{{photo.width * photo.height | pxPhotoFormatNumber}}</dd>
+          <dt>Date de prise de vue</dt>
+          <dd>{{photo.date | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
+          <dt>Date de modification</dt>
+          <dd>{{photo.dateLastModified | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
+          <span ng-if="photo.selected != null">
+            <dt>Date de sélection</dt>
+            <dd ng-if="photo.selected > 0">{{photo.selected | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
+            <dd ng-if="photo.selected === 0">Inconnue</dd>
+          </span>
+          <dt>Taille</dt>
+          <dd>{{photo.size | fileSizeFormat}}</dd>
+        </dl>
+      </div>
     </div>
   </div>
 </div>

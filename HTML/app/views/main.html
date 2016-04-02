@@ -23,6 +23,16 @@
         et
         <input type="number" style="width:50px;" ng-model="filter.resolutionMax"/> Mpx<br/>
         <br/>
+        Sélectionnée ? <input type="checkbox" ng-model="filter.selected"/><br/>
+        <span ng-if="filter.selected">
+          Afficher les photos avec une date de selection innconue ? <input type="checkbox" ng-model="filter.selected0"/><br/>
+          <br/>
+          Sélectionnée entre le :
+          <input type="date" ng-model="filter.dateSelectedStart"/><br/>
+          et le<br/>
+          <input type="date" ng-model="filter.dateSelectedEnd"/><br/>
+          <br/>
+        </span>
         <button
           ng-click="reset()">
           Effacer tous les filtres
@@ -80,6 +90,7 @@
         <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height={{photoLight.heightThumbnail}}"
              height="{{photoLight.heightThumbnail}}"
              width="{{photoLight.widthThumbnail}}" title="{{photoLight | json}}" ng-click="open(photoLight)"/>
+        <span class="selected" ng-show="photoLight.selected !== null">★</span>
       </a>
       <a ng-repeat-end></a>
     </div>

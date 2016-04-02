@@ -75,6 +75,7 @@ snap-content {
 
 .mainPage .photosList .photo {
   display: inline-block;
+  position: relative;
   vertical-align: middle;
   margin: 2px;
   font-size: 10px;
@@ -85,12 +86,20 @@ snap-content {
   background-image: url('/images/defaultImg.gif');
 }
 
+.mainPage .photosList .photo .selected {
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  color: yellow;
+  font-size: 32px;
+}
+
 .mainPage .filter {
   position: fixed;
   z-index: 10;
   top: 0;
   left: 0;
-  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.75);
   opacity: 0.9;
   width: 300px;
   height: 100%;
@@ -115,6 +124,11 @@ snap-content {
 
 .mainPage .filter.ng-hide-remove {
   animation: showFilter 0.5s 1;
+}
+
+.modal-photo .selected {
+  color: yellow;
+  margin-left: 30px;
 }
 
 @keyframes showFilter {

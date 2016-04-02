@@ -127,32 +127,52 @@ angular.module('htmlApp')
           var dateEnd = filter.dateEnd.getTime() + 86400000;
           ret = ret.filter(function (photo) {
             return photo.date <= dateEnd;
-          })
+          });
         }
 
 
         if (filter.dateLastModifiedStart) {
           ret = ret.filter(function (photo) {
             return photo.date >= filter.dateLastModifiedStart.getTime();
-          })
+          });
         }
         if (filter.dateLastModifiedEnd) {
           var dateEnd = filter.dateLastModifiedEnd.getTime() + 86400000;
           ret = ret.filter(function (photo) {
             return photo.date <= dateEnd;
-          })
+          });
         }
 
         if (filter.resolutionMin) {
           ret = ret.filter(function (photo) {
             return photo.width * photo.height >= filter.resolutionMin * 1000000;
-          })
+          });
         }
         if (filter.resolutionMax) {
           ret = ret.filter(function (photo) {
             return photo.width * photo.height <= filter.resolutionMax * 1000000;
           })
         }
+
+
+        if (filter.selected) {
+          ret = ret.filter(function (photo) {
+            return photo.selected != null;
+          });
+
+          if (filter.dateSelectedStart) {
+            ret = ret.filter(function (photo) {
+              return filter.selected0 || photo.selected >= filter.dateSelectedStart.getTime();
+            });
+          }
+          if (filter.dateSelectedEnd) {
+            ret = ret.filter(function (photo) {
+              return filter.selected0 || photo.selected <= filter.dateSelectedEnd.getTime();
+            });
+          }
+        }
+
+
       }
 
       return ret;
