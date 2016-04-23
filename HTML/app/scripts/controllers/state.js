@@ -17,8 +17,9 @@ angular.module('htmlApp')
 
     var intervalPromise = $interval(refreshState, 1000);
     $scope.$on('$destroy', function () {
-      if (intervalPromise)
+      if (intervalPromise) {
         $interval.cancel(intervalPromise);
+      }
     });
 
 
@@ -26,5 +27,5 @@ angular.module('htmlApp')
       $http.get(Config.urlServices + '/launchScan').catch(function () {
         $scope.errorLaunchScan = "Error";
       });
-    }
+    };
   });

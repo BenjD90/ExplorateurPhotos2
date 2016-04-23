@@ -83,7 +83,7 @@ snap-content {
 }
 
 .mainPage .photosList .photo img {
-  background-image: url('/images/defaultImg.gif');
+  background-image: url('../images/defaultImg.gif');
 }
 
 .mainPage .photosList .photo .selected {
@@ -129,6 +129,10 @@ snap-content {
 .modal-photo .selected {
   color: yellow;
   margin-left: 30px;
+}
+
+.modal-photo .row dd {
+  word-break: break-all;
 }
 
 @keyframes showFilter {

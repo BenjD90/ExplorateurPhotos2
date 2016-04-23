@@ -86,7 +86,7 @@ angular.module('htmlApp')
         });
         return ret;
       }
-    }
+    };
   }
 )
 ;

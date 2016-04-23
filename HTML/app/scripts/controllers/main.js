@@ -9,75 +9,6 @@
  */
 angular.module('htmlApp')
   .controller('MainCtrl', function (PhotosService, $scope, Config, $uibModal, photoModalService) {
-    $scope.urlThumbnail = Config.urlServices + "/thumbnail";
-
-    $scope.showFilter = false;
-    $scope.filter = {};
-    $scope.sortField = 'dateLastModified';
-    $scope.sortDesc = true;
-
-    $scope.Config = Config;
-
-    $scope.a = 5;
-    $scope.time = PhotosService.time;
-
-    $scope.reset = function () {
-      $scope.filter = {};
-    };
-
-    $scope.open = function (photoLight) {
-      photoModalService.setModalInstance($uibModal.open({
-        templateUrl: 'views/modals/photo.html',
-        controller: 'PhotoModalCtrl',
-        size: 'lg',
-        resolve: {
-          photoLight: photoLight
-        }
-      }));
-    }
-
-    getListPhotosToDisplay(PhotosService.getListPhotos()).then(function (array) {
-      $scope.listPhotosToDisplay = array;
-    });
-
-    $scope.$watch('windowHeight', function () {
-      $scope.listPhotosDivHeight = $scope.windowHeight - 2 - $('.header').outerHeight(true) - $('.subMenu').outerHeight(true);
-    });
-
-
-    $scope.$watchCollection('filter', function (newValue) {
-      getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
-        return filterPhotos(array, newValue);
-      })).then(function (array) {
-        $scope.listPhotosToDisplay = array;
-        document.querySelector('.photosList').scrollTop = 0;
-      });
-    });
-
-    $scope.sort = function (sortField) {
-      //if user doesn't change field
-      if ($scope.sortField == sortField) {
-        $scope.sortDesc = !$scope.sortDesc;
-      }
-      $scope.sortField = sortField;
-      getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
-          if (sortField !== 'resolution') {
-            return filterPhotos(array, $scope.filter).sort(function (a, b) {
-              return compareWithField(a, b, sortField);
-            });
-          } else {
-            return filterPhotos(array, $scope.filter).sort(function (a, b) {
-              return compareWithResolution(a, b, sortField);
-            });
-          }
-        }
-      )).
-        then(function (array) {
-          $scope.listPhotosToDisplay = array;
-          document.querySelector('.photosList').scrollTop = 0;
-        });
-    };
-
     function compareWithField(a, b, sortField) {
       return compareTwoFields(a[sortField], b[sortField], a, b);
     }
@@ -94,7 +25,7 @@ angular.module('htmlApp')
       } else if (fieldAValue > fieldBValue) {
         return $scope.sortDesc ? -1 : 1;
       } else {
-        if (a['path'] < b['path']) {
+        if (a.path < b.path) {
           return $scope.sortDesc ? 1 : -1;
         } else {
           return $scope.sortDesc ? -1 : 1;
@@ -121,7 +52,7 @@ angular.module('htmlApp')
         if (filter.dateStart) {
           ret = ret.filter(function (photo) {
             return photo.date >= filter.dateStart.getTime();
-          })
+          });
         }
         if (filter.dateEnd) {
           var dateEnd = filter.dateEnd.getTime() + 86400000;
@@ -137,9 +68,9 @@ angular.module('htmlApp')
           });
         }
         if (filter.dateLastModifiedEnd) {
-          var dateEnd = filter.dateLastModifiedEnd.getTime() + 86400000;
+          var dateEnd2 = filter.dateLastModifiedEnd.getTime() + 86400000;
           ret = ret.filter(function (photo) {
-            return photo.date <= dateEnd;
+            return photo.date <= dateEnd2;
           });
         }
 
@@ -151,13 +82,13 @@ angular.module('htmlApp')
         if (filter.resolutionMax) {
           ret = ret.filter(function (photo) {
             return photo.width * photo.height <= filter.resolutionMax * 1000000;
-          })
+          });
         }
 
 
         if (filter.selected) {
           ret = ret.filter(function (photo) {
-            return photo.selected != null;
+            return photo.selected !== null;
           });
 
           if (filter.dateSelectedStart) {
@@ -178,6 +109,73 @@ angular.module('htmlApp')
       return ret;
     }
 
-  }
-)
-;
+    $scope.urlThumbnail = Config.urlServices + "/thumbnail";
+
+    $scope.showFilter = false;
+    $scope.filter = {};
+    $scope.sortField = 'dateLastModified';
+    $scope.sortDesc = true;
+
+    $scope.Config = Config;
+
+    $scope.a = 5;
+    $scope.time = PhotosService.time;
+
+    $scope.reset = function () {
+      $scope.filter = {};
+    };
+
+    $scope.open = function (photoLight) {
+      photoModalService.setModalInstance($uibModal.open({
+        templateUrl: 'views/modals/photo.html',
+        controller: 'PhotoModalCtrl',
+        size: 'lg',
+        resolve: {
+          photoLight: photoLight
+        }
+      }));
+    };
+
+    getListPhotosToDisplay(PhotosService.getListPhotos()).then(function (array) {
+      $scope.listPhotosToDisplay = array;
+    });
+
+    $scope.$watch('windowHeight', function () {
+      $scope.listPhotosDivHeight = $scope.windowHeight - 2 - $('.header').outerHeight(true) - $('.subMenu').outerHeight(true);
+    });
+
+
+    $scope.$watchCollection('filter', function (newValue) {
+      getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
+        return filterPhotos(array, newValue);
+      })).then(function (array) {
+        $scope.listPhotosToDisplay = array;
+        document.querySelector('.photosList').scrollTop = 0;
+      });
+    });
+
+    $scope.sort = function (sortField) {
+      //if user doesn't change field
+      if ($scope.sortField === sortField) {
+        $scope.sortDesc = !$scope.sortDesc;
+      }
+      $scope.sortField = sortField;
+      getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
+          if (sortField !== 'resolution') {
+            return filterPhotos(array, $scope.filter).sort(function (a, b) {
+              return compareWithField(a, b, sortField);
+            });
+          } else {
+            return filterPhotos(array, $scope.filter).sort(function (a, b) {
+              return compareWithResolution(a, b, sortField);
+            });
+          }
+        }
+      )).
+        then(function (array) {
+          $scope.listPhotosToDisplay = array;
+          document.querySelector('.photosList').scrollTop = 0;
+        });
+    };
+
+  });

@@ -10,7 +10,7 @@ angular.module('htmlApp')
   .directive('resize', function ($window) {
     return {
       restrict: 'A',
-      link: function postLink(scope, element, attrs) {
+      link: function postLink(scope) {
         var w = angular.element($window);
         scope.getWindowDimensions = function () {
           return {
@@ -18,7 +18,7 @@ angular.module('htmlApp')
             'w': w.width()
           };
         };
-        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
+        scope.$watch(scope.getWindowDimensions, function (newValue) {
           scope.windowHeight = newValue.h;
           scope.windowWidth = newValue.w;
         }, true);
