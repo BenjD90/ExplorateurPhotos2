@@ -27,11 +27,12 @@ public class FileChangeDetector extends Thread {
   @Override
   public void run() {
     Path dir = new File(photosDir).toPath();
-    WatchService watcher = null;
+    WatchService watcher;
     try {
       watcher = FileSystems.getDefault().newWatchService();
     } catch (IOException e) {
       LOG.error("Can't start watchService", e);
+      return;
     }
 
     WatchEvent.Kind<?>[] eventsArray = {
@@ -67,10 +68,13 @@ public class FileChangeDetector extends Thread {
         }
 
         // The filename is the  context of the event.
+        @SuppressWarnings("unchecked")
         WatchEvent<Path> ev = (WatchEvent<Path>) event;
         Path filename = Paths.get(photosDir, ev.context().toString());
         if (PhotosUtils.isPhoto(filename.toFile())) {
-          scanOnFileChange.onChange(filename, (WatchEvent.Kind<Path>) kind);
+          @SuppressWarnings("unchecked")
+          WatchEvent.Kind<Path> pathKind = (WatchEvent.Kind<Path>) kind;
+          scanOnFileChange.onChange(filename, pathKind);
         }
       }
 

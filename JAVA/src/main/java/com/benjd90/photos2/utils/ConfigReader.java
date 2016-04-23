@@ -19,6 +19,7 @@ public class ConfigReader {
   public static final String KEY_PHOTOS_EXTENSION = "photosExtensions";
   public static final String KEY_FILENAME_LIST_PHOTOS = "listPhotosFileName";
   public static final String KEY_THUMBNAIL_HEIGHT = "thumbnailHeight";
+  public static final String KEY_CRON_SCHEDULER = "cronScheduler";
 
   /**
    * LOGGER For the class.

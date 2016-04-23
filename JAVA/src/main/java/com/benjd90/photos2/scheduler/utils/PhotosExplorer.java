@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +52,7 @@ public class PhotosExplorer {
         Metadata metadata = ImageMetadataReader.readMetadata(file);
         Directory directoryMetadata = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
         if (directoryMetadata != null) {
-          Date date = directoryMetadata.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL, TimeZone.getTimeZone(ZoneId.systemDefault()));
+          Date date = directoryMetadata.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL, TimeZone.getDefault());
           if (date != null && date.getTime() > 0) {
             takenDate = date;
           }

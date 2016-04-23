@@ -1,6 +1,7 @@
 package com.benjd90.photos2.scheduler;
 
 import com.benjd90.photos2.beans.State;
+import com.benjd90.photos2.utils.ConfigReader;
 import com.benjd90.photos2.utils.Constants;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -16,6 +17,8 @@ public class ScanScheduler {
   private static final Logger LOG = LoggerFactory.getLogger(ScanScheduler.class);
   private final State state = new State();
   private Scheduler scheduler = null;
+  private String cronScheduler = ConfigReader.getMessage(ConfigReader.KEY_CRON_SCHEDULER);
+
 
   public ScanScheduler() {
     JobDataMap jobData = new JobDataMap();
@@ -29,14 +32,16 @@ public class ScanScheduler {
     Trigger trigger = TriggerBuilder
             .newTrigger()
             .withIdentity("scanTrigger", "group1")
-            .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMinutes(100).repeatForever())
+            .withSchedule(CronScheduleBuilder.cronSchedule(cronScheduler))
             .build();
+
 
     // schedule it
     try {
       scheduler = new StdSchedulerFactory().getScheduler();
       scheduler.start();
       scheduler.scheduleJob(job, trigger);
+      LOG.info("Job scheduled : " + trigger);
     } catch (SchedulerException e) {
       LOG.error("Can't schedule Job", e);
     }
