@@ -197,7 +197,11 @@ public class ScanJob implements Job {
         if (date.equals(YES)) {
           ret.put(sectionName, new Date(0));
         } else {
-          ret.put(sectionName, new Date(Long.valueOf(date) * 1000));
+          try {
+            ret.put(sectionName, new Date(Long.valueOf(date) * 1000));
+          } catch (NumberFormatException e) {
+            ret.put(sectionName, new Date(0));
+          }
         }
       }
     }
