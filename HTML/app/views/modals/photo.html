@@ -1,17 +1,30 @@
 <div class="modal-photo">
   <div class="modal-header">
-    <h4 class="modal-title">{{photo.path | getFileNameFromPath}} {{photo.selected}}
+    <h4 class="modal-title">{{photo.path | getFileNameFromPath}}
       <span ng-show="photo.selected !== null" class="selected">★</span>
     </h4>
   </div>
   <div class="modal-body" id="photoDisplayArea" style="text-align: center;">
-    <a ng-href="{{urlThumbnail}}?path={{photo.path | urlEncode}}" target="_blank">
-      <img ng-src="{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{height}}&&width={{width}}"
-           height="{{height}}"
-           width="{{width}}"
-           style="background-image: url('{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{photo.heightThumbnail}}'); background-size: 100% 100%;"
-        />
-    </a>
+    <table>
+      <tr>
+        <td class="arrowLeft" ng-click="$parent.openLeft(photo, this)">
+          <span>&lt;</span>
+        </td>
+        <td>
+          <a ng-href="{{urlThumbnail}}?path={{photo.path | urlEncode}}" target="_blank">
+            <img ng-src="{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{height}}&&width={{width}}"
+                 height="{{height}}"
+                 width="{{width}}"
+                 id="photoModal"
+                 style="background-image: url('{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{photo.heightThumbnail}}'); background-size: 100% 100%;"
+              />
+          </a>
+        </td>
+        <td class="arrowRight" ng-click="$parent.openRight(photo, this)">
+          <span>&gt;</span>
+        </td>
+      </tr>
+    </table>
   </div>
   <div class="modal-footer" style="text-align: left;">
     <div class="row">

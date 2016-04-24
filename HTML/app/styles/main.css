@@ -135,6 +135,15 @@ snap-content {
   word-break: break-all;
 }
 
+.modal-photo .modal-body table {
+  width: 100%;
+}
+
+.modal-photo .modal-body table tr td.arrowLeft, .modal-photo .modal-body table tr td.arrowRight {
+  width: 50px;
+  cursor: pointer;
+}
+
 @keyframes showFilter {
   0% {
     transform: translateX(-100%);

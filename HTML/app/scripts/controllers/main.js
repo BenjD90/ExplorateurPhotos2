@@ -8,7 +8,7 @@
  * Controller of the htmlApp
  */
 angular.module('htmlApp')
-  .controller('MainCtrl', function (PhotosService, $scope, Config, $uibModal, photoModalService) {
+  .controller('MainCtrl', function (PhotosService, $scope, $q, Config, $uibModal, photoModalService) {
     function compareWithField(a, b, sortField) {
       return compareTwoFields(a[sortField], b[sortField], a, b);
     }
@@ -132,9 +132,61 @@ angular.module('htmlApp')
         size: 'lg',
         resolve: {
           photoLight: photoLight
-        }
+        },
+        scope: $scope
       }));
     };
+
+    function getNextPhoto(photoLight) {
+      var deferred = $q.defer();
+      $scope.listPhotosToDisplay.forEach(function (line, lineIndex) {
+        line.forEach(function (photo, index) {
+          if (photo.size === photoLight.size && photo.path === photoLight.path) {
+            if (index < line.length - 1) {
+              deferred.resolve(line[index + 1]);
+            } else if (lineIndex < $scope.listPhotosToDisplay.length - 1) {
+              deferred.resolve($scope.listPhotosToDisplay[lineIndex + 1][0]);
+            } else {
+              deferred.resolve($scope.listPhotosToDisplay[0][0]);
+            }
+          }
+        });
+      });
+      return deferred.promise;
+    }
+
+    function getPreviousPhoto(photoLight) {
+      var deferred = $q.defer();
+      $scope.listPhotosToDisplay.forEach(function (line, lineIndex) {
+        line.forEach(function (photo, index) {
+          if (photo.size === photoLight.size && photo.path === photoLight.path) {
+            if (index > 0) {
+              deferred.resolve(line[index - 1]);
+            } else if (lineIndex > 0) {
+              deferred.resolve($scope.listPhotosToDisplay[lineIndex - 1][$scope.listPhotosToDisplay[lineIndex - 1].length - 1]);
+            } else {
+              deferred.resolve($scope.listPhotosToDisplay[$scope.listPhotosToDisplay.length - 1][$scope.listPhotosToDisplay[$scope.listPhotosToDisplay.length - 1].length - 1]);
+            }
+          }
+        });
+      });
+      return deferred.promise;
+    }
+
+    $scope.openRight = function (photoLight, scopeModal) {
+      getNextPhoto(photoLight).then(function (photoRight) {
+        scopeModal.photo = photoRight;
+        scopeModal.updateWidthAndHeight();
+      });
+    };
+
+    $scope.openLeft = function (photoLight, scopeModal) {
+      getPreviousPhoto(photoLight).then(function (photoLeft) {
+        scopeModal.photo = photoLeft;
+        scopeModal.updateWidthAndHeight();
+      });
+    };
+
 
     getListPhotosToDisplay(PhotosService.getListPhotos()).then(function (array) {
       $scope.listPhotosToDisplay = array;
