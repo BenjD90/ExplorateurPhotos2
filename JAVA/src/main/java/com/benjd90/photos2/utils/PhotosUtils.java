@@ -3,8 +3,10 @@ package com.benjd90.photos2.utils;
 import com.benjd90.photos2.beans.PhotoError;
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
+import com.drew.imaging.FileType;
+import com.drew.imaging.FileTypeDetector;
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.lang.annotations.NotNull;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
@@ -16,10 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
+import javax.imageio.*;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -112,47 +111,67 @@ public class PhotosUtils {
   @Nullable
   BufferedImage readPhoto(File file) throws IOException {
     BufferedImage originalImage = null;
+    FileInputStream fis = null;
+    BufferedInputStream bis = null;
     try {
       originalImage = ImageIO.read(file);
-      Metadata metadata = ImageMetadataReader.readMetadata(file);
-      Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-      if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
-        int orientation;
-        orientation = exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
 
-        AffineTransform tx = new AffineTransform();
-        double angleRotation = 0;
-        switch (orientation) {
-          case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
-            return originalImage;
-          case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
-            LOG.debug("Rotate 90");
-            angleRotation = Math.toRadians(90);
-            break;
-          case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
-            LOG.debug("Rotate 180");
-            angleRotation = Math.toRadians(180);
-            break;
-          case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
-            LOG.debug("Rotate 270");
-            angleRotation = Math.toRadians(270);
-            break;
-          default:
-            return originalImage;
+      fis = new FileInputStream(file);
+      bis = new BufferedInputStream(fis);
+      if (FileTypeDetector.detectFileType(bis).equals(FileType.Jpeg)) {
+        Metadata metadata = JpegMetadataReader.readMetadata(bis);
+        Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+        if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+          int orientation;
+          orientation = exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+
+          AffineTransform tx = new AffineTransform();
+          double angleRotation = 0;
+          switch (orientation) {
+            case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
+              return originalImage;
+            case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
+              LOG.debug("Rotate 90");
+              angleRotation = Math.toRadians(90);
+              break;
+            case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
+              LOG.debug("Rotate 180");
+              angleRotation = Math.toRadians(180);
+              break;
+            case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
+              LOG.debug("Rotate 270");
+              angleRotation = Math.toRadians(270);
+              break;
+            default:
+              return originalImage;
+          }
+          return rotate(originalImage, angleRotation);
+        } else {
+          return originalImage;
         }
-        return rotate(originalImage, angleRotation);
       } else {
         return originalImage;
       }
-    } catch (ImageProcessingException e) {
+    } catch (JpegProcessingException e) {
       LOG.error("Can't read photo exif" + file.getAbsolutePath(), e);
       addError(Constants.EXIF, file.getAbsolutePath(), e);
     } catch (MetadataException e) {
       LOG.error("Can't read photo Metadata" + file.getAbsolutePath(), e);
       addError(Constants.METADATA, file.getAbsolutePath(), e);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | IIOException e) {
       LOG.error("Can't read photo " + file.getAbsolutePath(), e);
       addError(Constants.ALL, file.getAbsolutePath(), e);
+    } finally {
+      try {
+        if (fis != null) {
+          fis.close();
+        }
+        if (bis != null) {
+          bis.close();
+        }
+      } catch (IOException ex) {
+        LOG.error("Can't close input stream " + file.getAbsolutePath(), ex);
+      }
     }
     return originalImage;
   }

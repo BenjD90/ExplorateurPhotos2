@@ -3,8 +3,10 @@ package com.benjd90.photos2.scheduler.utils;
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.utils.Constants;
 import com.benjd90.photos2.utils.PhotosUtils;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
+import com.drew.imaging.FileType;
+import com.drew.imaging.FileTypeDetector;
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
@@ -15,7 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -49,18 +53,35 @@ public class PhotosExplorer {
     Date creationDate = null;
     Date takenDate = null;
     if (file.isFile() && PhotosUtils.isPhoto(file)) {
+      FileInputStream fis = null;
+      BufferedInputStream bis = null;
       try {
-        Metadata metadata = ImageMetadataReader.readMetadata(file);
-        Directory directoryMetadata = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
-        if (directoryMetadata != null) {
-          Date date = directoryMetadata.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL, TimeZone.getDefault());
-          if (date != null && date.getTime() > 0) {
-            takenDate = date;
+        fis = new FileInputStream(file);
+        bis = new BufferedInputStream(fis);
+        if (FileTypeDetector.detectFileType(bis).equals(FileType.Jpeg)) {
+          Metadata metadata = JpegMetadataReader.readMetadata(file);
+          Directory directoryMetadata = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+          if (directoryMetadata != null) {
+            Date date = directoryMetadata.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL, TimeZone.getDefault());
+            if (date != null && date.getTime() > 0) {
+              takenDate = date;
+            }
           }
         }
-      } catch (ImageProcessingException e) {
+      } catch (JpegProcessingException e) {
         LOG.error("Can't read photo " + file.getAbsolutePath(), e);
         PhotosUtils.addError(Constants.METADATA, file.getAbsolutePath(), e);
+      } finally {
+        try {
+          if (fis != null) {
+            fis.close();
+          }
+          if (bis != null) {
+            bis.close();
+          }
+        } catch (IOException ex) {
+          LOG.error("Can't close input stream " + file.getAbsolutePath(), ex);
+        }
       }
 
       BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
@@ -79,58 +100,81 @@ public class PhotosExplorer {
 
   public static Dimension getDimensions(File file) throws IOException {
     if (file.isFile() && PhotosUtils.isPhoto(file)) {
+      FileInputStream fis = null;
+      BufferedInputStream bis = null;
       try {
-        Metadata metadata = ImageMetadataReader.readMetadata(file);
-        Directory exifDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
-        if (exifDirectory != null && exifDirectory.containsTag(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH)
-                && exifDirectory.containsTag(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT)) {
-          int width, height;
-          try {
-            Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-            if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
-              int orientation = exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
-              switch (orientation) {
-                case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
-                case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
-                  //swap
-                  width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
-                  height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
-                  break;
-                case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
-                case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
-                default:
-                  width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
-                  height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+        fis = new FileInputStream(file);
+        bis = new BufferedInputStream(fis);
+        if (FileTypeDetector.detectFileType(bis).equals(FileType.Jpeg)) {
+          Metadata metadata = JpegMetadataReader.readMetadata(bis);
+          Directory exifDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+          if (exifDirectory != null && exifDirectory.containsTag(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH)
+                  && exifDirectory.containsTag(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT)) {
+            int width, height;
+            try {
+              Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+              if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+                int orientation = exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+                switch (orientation) {
+                  case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
+                  case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
+                    //swap
+                    width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+                    height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+                    break;
+                  case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
+                  case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
+                  default:
+                    width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+                    height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+                }
+              } else {
+                width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+                height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
               }
-            } else {
-              width = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
-              height = exifDirectory.getInt(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+            } catch (MetadataException e) {
+              //try to read height and width java buffered images
+              BufferedImage img = PhotosUtils.readPhoto(file);
+              if (img != null) {
+                width = img.getWidth();
+                height = img.getHeight();
+              } else {
+                return new Dimension();
+              }
             }
-          } catch (MetadataException e) {
-            //try to read height and width java buffered images
-            BufferedImage img = PhotosUtils.readPhoto(file);
-            if (img != null) {
-              width = img.getWidth();
-              height = img.getHeight();
-            } else {
-              return new Dimension();
-            }
+            return new Dimension(width, height);
+          } else {
+            return getBasicDimension(file);
           }
-          return new Dimension(width, height);
         } else {
-          BufferedImage img = PhotosUtils.readPhoto(file);
-          if (img == null) {
-            return new Dimension();
-          }
-          return new Dimension(img.getWidth(), img.getHeight());
+          return getBasicDimension(file);
         }
-      } catch (ImageProcessingException e) {
+      } catch (JpegProcessingException e) {
         LOG.error("Can't read photo EXIF", e);
         PhotosUtils.addError(Constants.METADATA, file.getAbsolutePath(), e);
         return new Dimension();
+      } finally {
+        try {
+          if (fis != null) {
+            fis.close();
+          }
+          if (bis != null) {
+            bis.close();
+          }
+        } catch (IOException ex) {
+          LOG.error("Can't close input stream " + file.getAbsolutePath(), ex);
+        }
       }
     } else {
       return new Dimension();
     }
+  }
+
+  private static Dimension getBasicDimension(File file) throws IOException {
+    BufferedImage img = PhotosUtils.readPhoto(file);
+    if (img == null) {
+      return new Dimension();
+    }
+    return new Dimension(img.getWidth(), img.getHeight());
   }
 }
