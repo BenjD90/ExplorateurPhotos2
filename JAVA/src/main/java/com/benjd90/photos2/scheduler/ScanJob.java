@@ -62,6 +62,7 @@ public class ScanJob implements Job {
     if (!isRunningToken.exists()) {
       try {
         LOG.info("Scan START " + appDirectory);
+        PhotosUtils.resetErrors();
         launchScan();
         runScan();
         LOG.info("Scan END OK" + appDirectory);
@@ -101,6 +102,7 @@ public class ScanJob implements Job {
 
     SchedulerUtils.storeScanResultToFile(objectToStore, appDirectory, listFilesFileName);
     state.setStep("SCAN, create cache");
+    LOG.info("End build index, create cache");
     createThumbnailsCache(photos);
   }
 
@@ -162,6 +164,7 @@ public class ScanJob implements Job {
       if (f.getIsDirectory()) {
         ret.addAll(getListOfPhotos(f.getPath()));
       }
+      state.setStep("SCAN, build index (" + ret.size() + ")");
     }
 
     ret = PhotosExplorer.filterOnlyPhotos(ret);

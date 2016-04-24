@@ -1,6 +1,7 @@
 package com.benjd90.photos2.scheduler.utils;
 
 import com.benjd90.photos2.beans.PhotoLight;
+import com.benjd90.photos2.utils.Constants;
 import com.benjd90.photos2.utils.PhotosUtils;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
@@ -58,7 +59,8 @@ public class PhotosExplorer {
           }
         }
       } catch (ImageProcessingException e) {
-        LOG.error("Can't read photo", e);
+        LOG.error("Can't read photo " + file.getAbsolutePath(), e);
+        PhotosUtils.addError(Constants.METADATA, file.getAbsolutePath(), e);
       }
 
       BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
@@ -107,16 +109,24 @@ public class PhotosExplorer {
           } catch (MetadataException e) {
             //try to read height and width java buffered images
             BufferedImage img = PhotosUtils.readPhoto(file);
-            width = img.getWidth();
-            height = img.getHeight();
+            if (img != null) {
+              width = img.getWidth();
+              height = img.getHeight();
+            } else {
+              return new Dimension();
+            }
           }
           return new Dimension(width, height);
         } else {
           BufferedImage img = PhotosUtils.readPhoto(file);
+          if (img == null) {
+            return new Dimension();
+          }
           return new Dimension(img.getWidth(), img.getHeight());
         }
       } catch (ImageProcessingException e) {
-        LOG.error("Can't read photo", e);
+        LOG.error("Can't read photo EXIF", e);
+        PhotosUtils.addError(Constants.METADATA, file.getAbsolutePath(), e);
         return new Dimension();
       }
     } else {

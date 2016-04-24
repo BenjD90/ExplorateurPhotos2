@@ -1,5 +1,6 @@
 package com.benjd90.photos2.utils;
 
+import com.benjd90.photos2.beans.PhotoError;
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
 import com.drew.imaging.ImageMetadataReader;
@@ -27,7 +28,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Benjamin on 15/02/2016.
@@ -35,6 +38,7 @@ import java.util.Date;
 public class PhotosUtils {
   private static final Logger LOG = LoggerFactory.getLogger(PhotosUtils.class);
 
+  private static List photosInError = new ArrayList<PhotoError>();
 
   public static boolean isPhoto(File fileToTest) {
     return ConfigReader.getPhotosExtensions().contains(FilenameUtils.getExtension(fileToTest.getAbsolutePath()).toLowerCase());
@@ -72,11 +76,15 @@ public class PhotosUtils {
         throw new IOException("Can't create cache directories" + thumbnailCacheFile.getParentFile());
       }
     }
-    BufferedImage originalImage = null;
+    BufferedImage originalImage;
     try {
       originalImage = PhotosUtils.readPhoto(photoOriginal);
+      if (originalImage == null) {
+        return null;
+      }
     } catch (IOException e) {
       LOG.error("Can't read input file " + photoOriginal.getAbsolutePath(), e);
+      addError(Constants.THUMBNAIL, photoOriginal.getAbsolutePath(), e);
       return null;
     }
     int widthOriginal = originalImage.getWidth();
@@ -100,9 +108,12 @@ public class PhotosUtils {
   }
 
 
-  public static BufferedImage readPhoto(File file) throws IOException {
-    BufferedImage originalImage = ImageIO.read(file);
+  public static
+  @Nullable
+  BufferedImage readPhoto(File file) throws IOException {
+    BufferedImage originalImage = null;
     try {
+      originalImage = ImageIO.read(file);
       Metadata metadata = ImageMetadataReader.readMetadata(file);
       Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
       if (exifIFD0Directory != null && exifIFD0Directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
@@ -134,9 +145,14 @@ public class PhotosUtils {
         return originalImage;
       }
     } catch (ImageProcessingException e) {
-      LOG.error("Can't read photo exif", e);
+      LOG.error("Can't read photo exif" + file.getAbsolutePath(), e);
+      addError(Constants.EXIF, file.getAbsolutePath(), e);
     } catch (MetadataException e) {
-      LOG.error("Can't read photo Metadata", e);
+      LOG.error("Can't read photo Metadata" + file.getAbsolutePath(), e);
+      addError(Constants.METADATA, file.getAbsolutePath(), e);
+    } catch (IllegalArgumentException e) {
+      LOG.error("Can't read photo " + file.getAbsolutePath(), e);
+      addError(Constants.ALL, file.getAbsolutePath(), e);
     }
     return originalImage;
   }
@@ -206,5 +222,17 @@ public class PhotosUtils {
     photoLight.setWidth((long) photoDimensions.getWidth());
     photoLight.setSelected(date);
     return photoLight;
+  }
+
+  public static java.util.List getPhotosInError() {
+    return photosInError;
+  }
+
+  public static void addError(String kind, String absolutePath, Exception e) {
+    photosInError.add(new PhotoError(kind, absolutePath, e.getClass() + " " + e.getMessage()));
+  }
+
+  public static void resetErrors() {
+    photosInError.clear();
   }
 }

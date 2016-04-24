@@ -25,7 +25,16 @@ angular.module('htmlApp')
 
     $scope.launchScan = function () {
       $http.get(Config.urlServices + '/launchScan').catch(function () {
-        $scope.errorLaunchScan = "Error";
+        $scope.errorLaunchScan = "Erreur lors de la demande de lancement du scan.";
       });
     };
+
+    $scope.photosInErrors = [];
+    $scope.launchErrors = function () {
+      $http.get(Config.urlServices + '/errors').then(function (response) {
+        $scope.photosInErrors = response.data;
+      });
+    };
+
+    $scope.launchErrors();
   });

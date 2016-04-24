@@ -9,4 +9,8 @@ public class Constants {
   public static final String STATE = "STATE";
   public static final String OK = "OK";
   public static final String KO = "KO";
+  public static final String THUMBNAIL = "THUMBNAIL";
+  public static final String EXIF = "EXIF";
+  public static final String METADATA = "METADATA";
+  public static final String ALL = "ALL";
 }
