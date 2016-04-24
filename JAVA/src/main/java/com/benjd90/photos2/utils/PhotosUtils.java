@@ -38,7 +38,7 @@ import java.util.List;
 public class PhotosUtils {
   private static final Logger LOG = LoggerFactory.getLogger(PhotosUtils.class);
 
-  private static List photosInError = new ArrayList<PhotoError>();
+  private static List<PhotoError> photosInError = new ArrayList<>();
 
   public static boolean isPhoto(File fileToTest) {
     return ConfigReader.getPhotosExtensions().contains(FilenameUtils.getExtension(fileToTest.getAbsolutePath()).toLowerCase());
