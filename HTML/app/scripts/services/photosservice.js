@@ -25,10 +25,12 @@ angular.module('htmlApp')
       var height = photo.height;
       var width = photo.width;
 
-      var ratio = width / height;
-
-      var thumbnailWidth = Math.ceil(thumbnailHeight * ratio);
-
+      var thumbnailWidth = 100;
+      if(width) {
+        var ratio = width / height;
+        thumbnailWidth = Math.ceil(thumbnailHeight * ratio);
+      }
+      
       return {
         heightThumbnail: thumbnailHeight,
         widthThumbnail: thumbnailWidth
