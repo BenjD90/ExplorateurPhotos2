@@ -187,11 +187,6 @@ angular.module('htmlApp')
       });
     };
 
-
-    getListPhotosToDisplay(PhotosService.getListPhotos()).then(function (array) {
-      $scope.listPhotosToDisplay = array;
-    });
-
     $scope.$watch('windowHeight', function () {
       $scope.listPhotosDivHeight = $scope.windowHeight - 2 - $('.header').outerHeight(true) - $('.subMenu').outerHeight(true);
     });
