@@ -16,8 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 /**
@@ -112,11 +114,17 @@ public class ScanJob implements Job {
     int i = 1;
     for (PhotoLight photo : photos) {
       File photoOriginal = new File(photo.getPath());
-      Path thumbnailPath = PhotosUtils.getThumbnailPath(null, thumbnailHeight, photoOriginal);
-      File thumbnailCacheFile = thumbnailPath.toFile();
+
+      BasicFileAttributes attr = Files.readAttributes(photoOriginal.toPath(), BasicFileAttributes.class);
       state.setActualPath(photo.getPath());
       state.setStep("SCAN, create cache (" + i + "/" + size + ")");
-      PhotosUtils.createCacheThumbnail(null, thumbnailHeight, photoOriginal, thumbnailCacheFile);
+      long modificationTime = attr.creationTime().toMillis();
+
+      if (state.getLastRunEndState() == null || (state.getLastRunEndState().equals(Constants.OK) && (modificationTime == 0 || modificationTime > state.getLastStart()))) {
+        Path thumbnailPath = PhotosUtils.getThumbnailPath(null, thumbnailHeight, photoOriginal);
+        File thumbnailCacheFile = thumbnailPath.toFile();
+        PhotosUtils.createCacheThumbnail(null, thumbnailHeight, photoOriginal, thumbnailCacheFile);
+      }
       i++;
     }
   }
