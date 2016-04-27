@@ -10,23 +10,27 @@
 
   <div>{{errorLaunchScan}}</div>
 
-  Information à propos du scan :<br/><br/>
-  Dernier fichier scanné : {{state.actualPath}}<br/>
-  Etape : {{state.step}}<br/>
-  Dernier scan terminé le <span ng-if="state.lastEnd">{{state.lastEnd | date:'dd/MM/yyyy HH:mm:ss'}}</span><br/>
-  Dernier scan démarré le {{state.lastStart | date:'dd/MM/yyyy HH:mm:ss'}}<br/>
-  Dernier état de scan terminé : {{state.lastRunEndState}}<br/>
+  <h3>Informations à propos du scan :</h3>
+
+  <div>
+    Dernier fichier scanné : {{state.actualPath}}<br/>
+    Etape : {{state.step}}<br/>
+    Dernier scan terminé le <span ng-if="state.lastEnd">{{state.lastEnd | date:'dd/MM/yyyy HH:mm:ss'}}</span><br/>
+    Dernier scan démarré le {{state.lastStart | date:'dd/MM/yyyy HH:mm:ss'}}<br/>
+    Dernier état de scan terminé : {{state.lastRunEndState}}<br/>
+  </div>
 
 
   <div ng-if="photosInErrors.length > 0">
-    Photos en erreur lors du dernier scan ({{photosInErrors.length}}) :
+    <h3>Photos en erreur lors du dernier scan ({{photosInErrors.length}}) :</h3>
+
     <div ng-repeat="error in photosInErrors">
       {{error.path}} : <b>{{error.kind}}</b> <br/>
       {{error.message}}
       <hr/>
     </div>
   </div>
-  <div ng-if="photosInErrors.length === 0">
+  <h3 ng-if="photosInErrors.length === 0">
     Aucune erreur à afficher
-  </div>
+  </h3>
 </div>
