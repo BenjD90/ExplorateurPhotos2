@@ -55,6 +55,11 @@
           </span>
           <dt>Taille</dt>
           <dd>{{photo.size | fileSizeFormat}}</dd>
+          <dt>
+            <a target="_blank"
+               ng-href="http://regex.info/exif.cgi?dummy=on&imgurl=http%3A{{urlThumbnail | urlEncode}}%3Fpath%3D{{photo.path | urlEncode | urlEncode}}">Toutes
+              les infos</a>
+          </dt>
         </dl>
       </div>
     </div>
