@@ -120,6 +120,7 @@ angular.module('htmlApp')
 
     $scope.a = 5;
     $scope.time = PhotosService.time;
+    $scope.loading = false;
 
     $scope.reset = function () {
       $scope.filter = {};
@@ -193,10 +194,15 @@ angular.module('htmlApp')
 
 
     $scope.$watchCollection('filter', function (newValue) {
+      $scope.loading = 'Téléchargement de la liste des photos.';
       getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
-        return filterPhotos(array, newValue);
+        $scope.loading = 'Application des filtres.';
+        var ret = filterPhotos(array, newValue);
+        $scope.loading = 'Répartition des photos par ligne.';
+        return ret;
       })).then(function (array) {
         $scope.listPhotosToDisplay = array;
+        $scope.loading = false;
         document.querySelector('.photosList').scrollTop = 0;
       });
     });

@@ -82,7 +82,10 @@
     </ul>
   </nav>
 
-  <div vs-repeat style="overflow: auto;"
+  <div ng-if="loading">
+    {{loading}}
+  </div>
+  <div ng-hide="loading" vs-repeat style="overflow: auto;"
        ng-style="{height : listPhotosDivHeight}"
        class="photosList">
     <div ng-repeat="line in listPhotosToDisplay" class="line">
