@@ -6,6 +6,7 @@ import com.benjd90.photos2.scheduler.ScanScheduler;
 import com.benjd90.photos2.utils.PhotosUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,6 +22,20 @@ public class SchecdulerController {
 
   private static final Logger LOG = LoggerFactory.getLogger(SchecdulerController.class);
 
+  @Value("${appFilesDir}")
+  private String appDirectory;
+
+  @Value("${isRunningFileName}")
+  private String isRunningFileName;
+
+  @Value("${listPhotosFileName}")
+  private String listFilesFileName;
+
+  @Value("${path}")
+  private String photosPath;
+
+  @Value("${thumbnailHeight}")
+  private Integer thumbnailHeight;
 
   @Resource(name = "ScanScheduler")
   private ScanScheduler scanScheduler;
@@ -45,7 +60,7 @@ public class SchecdulerController {
       @Override
       public void run() {
         ScanJob scanJob = new ScanJob();
-        scanJob.run(scanScheduler.getState());
+        scanJob.run(scanScheduler.getState(), appDirectory, isRunningFileName, listFilesFileName, photosPath, thumbnailHeight);
       }
     }.start();
   }

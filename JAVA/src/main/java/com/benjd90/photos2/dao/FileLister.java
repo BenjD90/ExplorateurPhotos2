@@ -2,10 +2,10 @@ package com.benjd90.photos2.dao;
 
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.beans.PhotosListStorage;
-import com.benjd90.photos2.utils.ConfigReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -20,11 +20,16 @@ import java.util.List;
 public class FileLister implements IFileLister {
   private static final Logger LOG = LoggerFactory.getLogger(FileLister.class);
 
+  @Value("${appFilesDir}")
+  private String appDirectory;
+
+  @Value("${listPhotosFileName}")
+  private String listPhotosFileName;
 
   @Override
   public List<PhotoLight> getAllPhotosExisting() throws IOException {
     ObjectMapper om = new ObjectMapper();
-    File storageFile = new File(ConfigReader.getMessage(ConfigReader.KEY_APP_DIR), ConfigReader.getMessage(ConfigReader.KEY_FILENAME_LIST_PHOTOS));
+    File storageFile = new File(appDirectory, listPhotosFileName);
     PhotosListStorage photosListStorage = om.readValue(storageFile, PhotosListStorage.class);
     return photosListStorage.getPhotos();
   }

@@ -6,7 +6,10 @@ import com.benjd90.photos2.beans.PhotosListStorage;
 import com.benjd90.photos2.beans.State;
 import com.benjd90.photos2.beans.comparator.PhotoLightDefaultComparator;
 import com.benjd90.photos2.scheduler.utils.PhotosExplorer;
-import com.benjd90.photos2.utils.*;
+import com.benjd90.photos2.utils.Constants;
+import com.benjd90.photos2.utils.PhotosUtils;
+import com.benjd90.photos2.utils.SchedulerUtils;
+import com.benjd90.photos2.utils.TimeUtils;
 import org.ini4j.Ini;
 import org.ini4j.Profile;
 import org.quartz.Job;
@@ -26,31 +29,51 @@ import java.util.*;
  * Job that write the file : listPhotos.json
  * Created by Benjamin on 23/02/2016.
  */
-//TODO add scan on file change https://docs.oracle.com/javase/tutorial/essential/io/notification.html
 public class ScanJob implements Job {
   private static final Logger LOG = LoggerFactory.getLogger(ScanJob.class);
   public static final String PICASA_INI = ".picasa.ini";
   private static final String YES = "\"yes\"";
 
-  private final String appDirectory = ConfigReader.getMessage(ConfigReader.KEY_APP_DIR);
-  private final String isRunningFileName = ConfigReader.getMessage(ConfigReader.KEY_IS_RUNNING_FILE_NAME);
-  private String listFilesFileName = ConfigReader.getMessage(ConfigReader.KEY_FILENAME_LIST_PHOTOS);
+  private String appDirectory;
+
+  private String isRunningFileName;
+
+  private String listFilesFileName;
+
+  private String photosPath;
+
+  private Integer thumbnailHeight;
+
   private State state;
 
   public void execute(JobExecutionContext context)
           throws JobExecutionException {
-    State state = (State) context.getMergedJobDataMap().get(Constants.STATE);
-    run(state);
+    this.state = (State) context.getMergedJobDataMap().get(Constants.STATE);
+    this.appDirectory = (String) context.getMergedJobDataMap().get("appDirectory");
+    this.isRunningFileName = (String) context.getMergedJobDataMap().get("isRunningFileName");
+    this.listFilesFileName = (String) context.getMergedJobDataMap().get("listFilesFileName");
+    this.photosPath = (String) context.getMergedJobDataMap().get("photosPath");
+    this.thumbnailHeight = (Integer) context.getMergedJobDataMap().get("thumbnailHeight");
+    run();
   }
 
-  public void run(State state) {
+  public void run(State state, String appDirectory, String isRunningFileName, String listFilesFileName, String photosPath, Integer thumbnailHeight) {
     this.state = state;
+    this.appDirectory = appDirectory;
+    this.isRunningFileName = isRunningFileName;
+    this.listFilesFileName = listFilesFileName;
+    this.photosPath = photosPath;
+    this.thumbnailHeight = thumbnailHeight;
+    run();
+  }
+
+  private void run() {
     long start = System.currentTimeMillis();
-    LOG.info("Start scan job of appDirectory : " + ConfigReader.getMessage(ConfigReader.KEY_PATH));
+    LOG.info("Start scan job of appDirectory : " + this.photosPath);
     state.setLastStart(start);
     state.setStep("INIT");
 
-    File appDirectoryFile = new File(appDirectory);
+    File appDirectoryFile = new File(this.appDirectory);
     if (!appDirectoryFile.exists()) {
       if (!appDirectoryFile.mkdir()) {
         LOG.error("Can't create appDirectory" + appDirectoryFile.getAbsolutePath());
@@ -60,23 +83,23 @@ public class ScanJob implements Job {
       }
     }
 
-    File isRunningToken = new File(appDirectory, isRunningFileName);
+    File isRunningToken = new File(this.appDirectory, this.isRunningFileName);
     if (!isRunningToken.exists()) {
       try {
-        LOG.info("Scan START " + appDirectory);
+        LOG.info("Scan START " + this.appDirectory);
         PhotosUtils.resetErrors();
         launchScan();
         runScan();
-        LOG.info("Scan END OK" + appDirectory);
+        LOG.info("Scan END OK" + this.appDirectory);
         endScan();
         state.setLastRunEndState(Constants.OK);
       } catch (IOException e) {
         LOG.error("IO Error while scanning", e);
-        LOG.info("Scan END KO " + appDirectory);
+        LOG.info("Scan END KO " + this.appDirectory);
         state.setLastRunEndState(Constants.KO);
         state.setStep("");
         try {
-          PrintWriter writer = new PrintWriter(new FileOutputStream(new File(isRunningFileName)), true);
+          PrintWriter writer = new PrintWriter(new FileOutputStream(new File(this.isRunningFileName)), true);
           writer.println("end=" + new Date().getTime());
           writer.println("status=ERR");
           writer.close();
@@ -90,12 +113,12 @@ public class ScanJob implements Job {
     state.setLastEnd(System.currentTimeMillis());
     state.setStep("DONE");
 
-    LOG.info("End scan job in " + TimeUtils.getTime(start) + ". " + appDirectory);
+    LOG.info("End scan job in " + TimeUtils.getTime(start) + ". " + this.appDirectory);
   }
 
   private synchronized void runScan() throws IOException {
     state.setStep("SCAN, build index");
-    List<PhotoLight> photos = getListOfPhotosRecursively(ConfigReader.getMessage(ConfigReader.KEY_PATH));
+    List<PhotoLight> photos = getListOfPhotosRecursively(photosPath);
 
     PhotosListStorage objectToStore = new PhotosListStorage();
     objectToStore.setDateScan(new Date());
@@ -109,7 +132,6 @@ public class ScanJob implements Job {
   }
 
   private void createThumbnailsCache(List<PhotoLight> photos) throws IOException {
-    Integer thumbnailHeight = Integer.valueOf(ConfigReader.getMessage(ConfigReader.KEY_THUMBNAIL_HEIGHT));
     int size = photos.size();
     int i = 1;
     for (PhotoLight photo : photos) {

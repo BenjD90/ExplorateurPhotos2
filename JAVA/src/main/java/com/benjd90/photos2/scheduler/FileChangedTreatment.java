@@ -12,7 +12,6 @@ public class FileChangedTreatment extends Thread {
   private ScanOnFileChange scanOnFileChange;
 
   public FileChangedTreatment(ScanOnFileChange scanOnFileChange) {
-
     this.scanOnFileChange = scanOnFileChange;
   }
 

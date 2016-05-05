@@ -1,9 +1,9 @@
 package com.benjd90.photos2.dao;
 
-import com.benjd90.photos2.utils.ConfigReader;
 import com.benjd90.photos2.utils.PhotosUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -19,6 +19,9 @@ import java.nio.file.Path;
 public class PhotosDao implements IPhotosDao {
   private static final Logger LOG = LoggerFactory.getLogger(PhotosDao.class);
 
+  @Value("${thumbnailHeight}")
+  private Integer thumbnailHeight;
+
   @Override
   public byte[] getThumbnail(String path, Integer width, Integer height) throws IOException {
     File photoOriginal = new File(path);
@@ -26,7 +29,7 @@ public class PhotosDao implements IPhotosDao {
 
       if (width == null && height == null) { // return original photo
         return Files.readAllBytes(photoOriginal.toPath());
-      } else if (height != null && width == null && height.equals(Integer.valueOf(ConfigReader.getMessage(ConfigReader.KEY_THUMBNAIL_HEIGHT)))) {
+      } else if (height != null && width == null && height.equals(thumbnailHeight)) {
         Path thumbnailPath = PhotosUtils.getThumbnailPath(width, height, photoOriginal);
         File thumbnailCacheFile = thumbnailPath.toFile();
 

@@ -16,6 +16,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import javax.imageio.*;
@@ -34,17 +36,46 @@ import java.util.List;
 /**
  * Created by Benjamin on 15/02/2016.
  */
+@Component
 public class PhotosUtils {
   private static final Logger LOG = LoggerFactory.getLogger(PhotosUtils.class);
 
   private static List<PhotoError> photosInError = new ArrayList<>();
 
+  private static String photosExtensions;
+
+  @Value("${photosExtensions}")
+  public void setPhotosExtensions(String photosExtensions) {
+    PhotosUtils.photosExtensions = photosExtensions;
+  }
+
+  private static String photosPath;
+
+  @Value("${path}")
+  public void setPhotosPath(String photosPath) {
+    PhotosUtils.photosPath = photosPath;
+  }
+
+  private static String appDir;
+
+  @Value("${appFilesDir}")
+  public void setAppDir(String appDir) {
+    PhotosUtils.appDir = appDir;
+  }
+
+  private static String cacheDir;
+
+  @Value("${cacheDir}")
+  public void setCacheDir(String cacheDir) {
+    PhotosUtils.cacheDir = cacheDir;
+  }
+
   public static boolean isPhoto(File fileToTest) {
-    return ConfigReader.getPhotosExtensions().contains(FilenameUtils.getExtension(fileToTest.getAbsolutePath()).toLowerCase());
+    return photosExtensions.contains(FilenameUtils.getExtension(fileToTest.getAbsolutePath()).toLowerCase());
   }
 
   public static boolean isPhoto(PhotoLight photoToTest) {
-    return ConfigReader.getPhotosExtensions().contains(FilenameUtils.getExtension(photoToTest.getPath()).toLowerCase());
+    return photosExtensions.contains(FilenameUtils.getExtension(photoToTest.getPath()).toLowerCase());
   }
 
   public static BufferedImage resizeImage(BufferedImage originalImage, int width, int height) {
@@ -225,8 +256,8 @@ public class PhotosUtils {
   }
 
   public static Path getThumbnailPath(Integer width, Integer height, File photoOriginal) {
-    String pathToPhotoInPhotosLibrary = StringUtils.replaceOnce(photoOriginal.getAbsolutePath(), ConfigReader.getMessage(ConfigReader.KEY_PATH), Constants.EMPTY_STRING);
-    return Paths.get(ConfigReader.getMessage(ConfigReader.KEY_APP_DIR), ConfigReader.getMessage(ConfigReader.KEY_CACHE_DIR), width + "x" + height, pathToPhotoInPhotosLibrary);
+    String pathToPhotoInPhotosLibrary = StringUtils.replaceOnce(photoOriginal.getAbsolutePath(), photosPath, Constants.EMPTY_STRING);
+    return Paths.get(appDir, cacheDir, width + "x" + height, pathToPhotoInPhotosLibrary);
   }
 
   public static PhotoLight getPhotoLightFromFile(@NotNull File file, @Nullable Date date) throws IOException {

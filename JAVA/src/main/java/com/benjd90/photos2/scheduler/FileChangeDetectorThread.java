@@ -1,6 +1,5 @@
 package com.benjd90.photos2.scheduler;
 
-import com.benjd90.photos2.utils.ConfigReader;
 import com.benjd90.photos2.utils.PhotosUtils;
 import com.sun.nio.file.ExtendedWatchEventModifier;
 import org.slf4j.Logger;
@@ -11,22 +10,20 @@ import java.io.IOException;
 import java.nio.file.*;
 
 /**
- * Created by Benjamin on 11/03/2016.
+ * Created by Benjamin on 11/03/2016
  */
-public class FileChangeDetector extends Thread {
-  private static final Logger LOG = LoggerFactory.getLogger(FileChangeDetector.class);
+public class FileChangeDetectorThread extends Thread {
+  private static final Logger LOG = LoggerFactory.getLogger(FileChangeDetectorThread.class);
   private ScanOnFileChange scanOnFileChange;
-  private String photosDir;
 
-  public FileChangeDetector(ScanOnFileChange scanOnFileChange) {
-    photosDir = ConfigReader.getMessage(ConfigReader.KEY_PATH);
+  public FileChangeDetectorThread(ScanOnFileChange scanOnFileChange) {
     this.scanOnFileChange = scanOnFileChange;
   }
 
 
   @Override
   public void run() {
-    Path dir = new File(photosDir).toPath();
+    Path dir = new File(scanOnFileChange.getPhotosPath()).toPath();
     WatchService watcher;
     try {
       watcher = FileSystems.getDefault().newWatchService();
@@ -70,7 +67,7 @@ public class FileChangeDetector extends Thread {
         // The filename is the  context of the event.
         @SuppressWarnings("unchecked")
         WatchEvent<Path> ev = (WatchEvent<Path>) event;
-        Path filename = Paths.get(photosDir, ev.context().toString());
+        Path filename = Paths.get(scanOnFileChange.getPhotosPath(), ev.context().toString());
         if (PhotosUtils.isPhoto(filename.toFile())) {
           @SuppressWarnings("unchecked")
           WatchEvent.Kind<Path> pathKind = (WatchEvent.Kind<Path>) kind;

@@ -4,14 +4,15 @@ import com.benjd90.photos2.beans.FileChangeEvent;
 import com.benjd90.photos2.beans.PhotoLight;
 import com.benjd90.photos2.beans.PhotosListStorage;
 import com.benjd90.photos2.beans.comparator.PhotoLightDefaultComparator;
-import com.benjd90.photos2.utils.ConfigReader;
 import com.benjd90.photos2.utils.PhotosUtils;
 import com.benjd90.photos2.utils.SchedulerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,13 +28,32 @@ import java.util.*;
 @Component
 public class ScanOnFileChange {
   private static final Logger LOG = LoggerFactory.getLogger(ScanOnFileChange.class);
-  private final String appDirectory = ConfigReader.getMessage(ConfigReader.KEY_APP_DIR);
-  private final String isRunningFileName = ConfigReader.getMessage(ConfigReader.KEY_IS_RUNNING_FILE_NAME);
-  private final String listFilesFileName = ConfigReader.getMessage(ConfigReader.KEY_FILENAME_LIST_PHOTOS);
+
+  @Value("${appFilesDir}")
+  private String appDirectory;
+
+  @Value("${isRunningFileName}")
+  private String isRunningFileName;
+
+  @Value("${listPhotosFileName}")
+  private String listPhotosFileName;
+
+
+  @Value("${path}")
+  private String photosPath;
+
+  @Value("${thumbnailHeight}")
+  private Integer thumbnailHeight;
+
+  public String getPhotosPath() {
+    return photosPath;
+  }
+
   private LinkedList<FileChangeEvent> filesToTreat = new LinkedList<>();
 
-  public ScanOnFileChange() throws IOException {
-    FileChangeDetector detector = new FileChangeDetector(this);
+  @PostConstruct
+  public void init() {
+    FileChangeDetectorThread detector = new FileChangeDetectorThread(this);
     FileChangedTreatment fileChangedTreatment = new FileChangedTreatment(this);
     detector.start();
     fileChangedTreatment.start();
@@ -98,21 +118,20 @@ public class ScanOnFileChange {
 
   private void addAndRemoveFiles(Set<File> filesToAdd, Set<File> filesToDelete) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    File outFile = new File(appDirectory, listFilesFileName);
+    File outFile = new File(appDirectory, listPhotosFileName);
     PhotosListStorage objectStored = mapper.readValue(outFile, PhotosListStorage.class);
     List<PhotoLight> photos = objectStored.getPhotos();
 
     photos = removeAllFilesFromIndex(filesToDelete, photos);
     addAllFilesToIndex(filesToAdd, photos);
 
-    Integer thumbnailHeight = Integer.valueOf(ConfigReader.getMessage(ConfigReader.KEY_THUMBNAIL_HEIGHT));
     removeAllThumbnails(filesToDelete, thumbnailHeight);
     addAllThumbnails(filesToAdd, thumbnailHeight);
 
     Collections.sort(photos, new PhotoLightDefaultComparator());
 
     objectStored.setDateScan(new Date());
-    SchedulerUtils.storeScanResultToFile(objectStored, appDirectory, listFilesFileName);
+    SchedulerUtils.storeScanResultToFile(objectStored, appDirectory, listPhotosFileName);
   }
 
   private void removeAllThumbnails(Set<File> filesToDelete, Integer thumbnailHeight) throws IOException {
