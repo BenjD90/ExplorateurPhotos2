@@ -1,7 +1,6 @@
 <div class="mainPage" resize>
   <!-- TODO change filter/sort do like PLEX -->
   <div class="filter" ng-show="showFilter">
-    <div class="close" ng-click="showFilter = false">X</div>
     <uib-tabset>
       <uib-tab index="0" heading="Filtrer">
         <input type="text" placeholder="Filtre" ng-model="filter.text" size="25"/>
@@ -37,6 +36,8 @@
           ng-click="reset()">
           Effacer tous les filtres
         </button>
+        <br/>
+        {{nbrPhotosFiltered}}/{{nbreTotalPhotos}}
       </uib-tab>
       <uib-tab index="1" heading="Trier">
         <p>
@@ -73,6 +74,7 @@
         </p>
       </uib-tab>
     </uib-tabset>
+    <div class="close" ng-click="showFilter = false">X</div>
   </div>
 
   <nav class="navbar navbar-default subMenu">

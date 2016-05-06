@@ -118,7 +118,6 @@ angular.module('htmlApp')
 
     $scope.Config = Config;
 
-    $scope.a = 5;
     $scope.time = PhotosService.time;
     $scope.loading = false;
 
@@ -197,8 +196,10 @@ angular.module('htmlApp')
       $scope.loading = 'Téléchargement de la liste des photos.';
       getListPhotosToDisplay(PhotosService.getListPhotos().then(function (array) {
         $scope.loading = 'Application des filtres.';
+        $scope.nbreTotalPhotos = array.length;
         var ret = filterPhotos(array, newValue);
         $scope.loading = 'Répartition des photos par ligne.';
+        $scope.nbrPhotosFiltered = ret.length;
         return ret;
       })).then(function (array) {
         $scope.listPhotosToDisplay = array;
