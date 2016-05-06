@@ -8,13 +8,15 @@
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   <!-- build:css(.) styles/vendor.css -->
   <!-- bower:css -->
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-  <link rel="stylesheet" href="bower_components/angular-snap/angular-snap.css" />
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css"/>
+  <link rel="stylesheet" href="bower_components/angular-snap/angular-snap.css"/>
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css(.tmp) styles/main.css -->
-  <link rel="stylesheet" href="styles/bootstrap.min.css">
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="common/styles/bootstrap.min.css">
+  <link rel="stylesheet" href="main/css/style.css"/>
+  <link rel="stylesheet" href="main/modal/css/style.css"/>
+  <link rel="stylesheet" href="state/css/style.css"/>
   <!-- endbuild -->
 </head>
 <body ng-app="htmlApp">
@@ -27,14 +29,14 @@
 <!-- Add your site or application content here -->
 <snap-drawer>
   <ul class="nav nav-pills nav-stacked">
-    <li><a href="#/">Home</a></li>
-    <li><a ng-href="#/state">Etat du scan</a></li>
+    <li><a ui-sref="main">Home</a></li>
+    <li><a ui-sref="state">Etat du scan</a></li>
   </ul>
 </snap-drawer>
 
 <snap-content snap-opt-disable>
   <div class="">
-    <div ng-view=""></div>
+    <div ui-view=""></div>
   </div>
 </snap-content>
 
@@ -67,24 +69,30 @@
 <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 <script src="bower_components/snapjs/snap.js"></script>
 <script src="bower_components/angular-snap/angular-snap.js"></script>
+<script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
-<script src="lib/angular-locale_fr-fr.js"></script>
+<script src="common/lib/angular-locale_fr-fr.js"></script>
 
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
-<script src="scripts/app.js"></script>
-<script src="scripts/controllers/main.js"></script>
-<script src="scripts/controllers/state.js"></script>
-<script src="scripts/services/config.js"></script>
-<script src="scripts/services/photosservice.js"></script>
-<script src="scripts/filters/urlencode.js"></script>
-<script src="scripts/filters/filesizeformat.js"></script>
-<script src="scripts/directives/resize.js"></script>
-<script src="scripts/controllers/photomodal.js"></script>
-<script src="scripts/services/photomodalservice.js"></script>
-<script src="scripts/filters/getfilenamefrompath.js"></script>
-<script src="scripts/filters/pxphotoformatnumber.js"></script>
+<script src="app.js"></script>
+
+<script src="common/constants/config.js"></script>
+<script src="common/directives/resize.js"></script>
+<script src="common/filters/file-size-format.js"></script>
+<script src="common/filters/get-filename-from-path.js"></script>
+<script src="common/filters/px-photo-format-number.js"></script>
+<script src="common/filters/urlencode.js"></script>
+<script src="common/lib/angular-locale_fr-fr.js"></script>
+
+<script src="main/modal/service.js"></script>
+<script src="main/modal/ctrl.js"></script>
+<script src="main/module.js"></script>
+<script src="main/service.js"></script>
+<script src="main/ctrl.js"></script>
+<script src="state/ctrl.js"></script>
+<script src="state/module.js"></script>
 <!-- endbuild -->
 </body>
 </html>
