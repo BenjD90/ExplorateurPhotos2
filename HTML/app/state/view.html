@@ -1,0 +1,36 @@
+<div class="statePage">
+  <nav class="navbar navbar-default">
+    <ul class="nav navbar-nav">
+      <li class="active"><a snap-toggle="left">Menu</a></li>
+      <li><a ng-click="launchScan()">Lancer une demande de scan</a></li>
+      <li><a ng-click="launchErrors()">Rafraichir les erreurs du dernier scan</a></li>
+
+    </ul>
+  </nav>
+
+  <div>{{errorLaunchScan}}</div>
+
+  <h3>Informations à propos du scan :</h3>
+
+  <div>
+    Dernier fichier scanné : {{state.actualPath}}<br/>
+    Etape : {{state.step}}<br/>
+    Dernier scan terminé le <span ng-if="state.lastEnd">{{state.lastEnd | date:'dd/MM/yyyy HH:mm:ss'}}</span><br/>
+    Dernier scan démarré le {{state.lastStart | date:'dd/MM/yyyy HH:mm:ss'}}<br/>
+    Dernier état de scan terminé : {{state.lastRunEndState}}<br/>
+  </div>
+
+
+  <div ng-if="photosInErrors.length > 0">
+    <h3>Photos en erreur lors du dernier scan ({{photosInErrors.length}}) :</h3>
+
+    <div ng-repeat="error in photosInErrors">
+      {{error.path}} : <b>{{error.kind}}</b> <br/>
+      {{error.message}}
+      <hr/>
+    </div>
+  </div>
+  <h3 ng-if="photosInErrors.length === 0">
+    Aucune erreur à afficher
+  </h3>
+</div>

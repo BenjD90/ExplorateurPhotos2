@@ -128,7 +128,7 @@ angular.module('htmlApp')
 
     $scope.open = function (photoLight) {
       photoModalService.setModalInstance($uibModal.open({
-        templateUrl: 'views/modals/photo.html',
+        templateUrl: 'main/modal/view.html',
         controller: 'PhotoModalCtrl',
         size: 'lg',
         resolve: {

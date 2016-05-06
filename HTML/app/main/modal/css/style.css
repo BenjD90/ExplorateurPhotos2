@@ -1,0 +1,19 @@
+
+.modal-photo .selected {
+  color: yellow;
+  margin-left: 30px;
+}
+
+.modal-photo .row dd {
+  word-break: break-all;
+}
+
+.modal-photo .modal-body table {
+  width: 100%;
+}
+
+.modal-photo .modal-body table tr td.arrowLeft, .modal-photo .modal-body table tr td.arrowRight {
+  width: 50px;
+  cursor: pointer;
+}
+
