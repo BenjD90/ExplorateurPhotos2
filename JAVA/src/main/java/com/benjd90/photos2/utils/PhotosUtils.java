@@ -71,11 +71,13 @@ public class PhotosUtils {
   }
 
   public static boolean isPhoto(File fileToTest) {
-    return photosExtensions.contains(FilenameUtils.getExtension(fileToTest.getAbsolutePath()).toLowerCase());
+    String extension = FilenameUtils.getExtension(fileToTest.getAbsolutePath()).toLowerCase();
+    return StringUtils.isNoneBlank(extension) && photosExtensions.contains(extension);
   }
 
   public static boolean isPhoto(PhotoLight photoToTest) {
-    return photosExtensions.contains(FilenameUtils.getExtension(photoToTest.getPath()).toLowerCase());
+    String extension = FilenameUtils.getExtension(photoToTest.getPath()).toLowerCase();
+    return StringUtils.isNoneBlank(extension) && photosExtensions.contains(extension);
   }
 
   public static BufferedImage resizeImage(BufferedImage originalImage, int width, int height) {

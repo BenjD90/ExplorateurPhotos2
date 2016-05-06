@@ -95,6 +95,7 @@
                     <url>http://localhost:8081/</url>
                     <server>localhost</server>
                     <path>/</path>
+                    <uriEncoding>UTF-8</uriEncoding>
                 </configuration>
             </plugin>
         </plugins>
