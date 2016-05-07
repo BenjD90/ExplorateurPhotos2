@@ -1,13 +1,15 @@
 <div class="modal-photo">
   <div class="modal-header">
-    <h4 class="modal-title">{{photo.path | getFileNameFromPath}}
+    <h4 class="modal-title">
+      <a class="glyphicon glyphicon-arrow-left" ui-sref="main"></a>
+      {{photo.path | getFileNameFromPath}}
       <span ng-show="photo.selected !== null" class="selected">★</span>
     </h4>
   </div>
   <div class="modal-body" id="photoDisplayArea" style="text-align: center;">
     <table>
       <tr>
-        <td class="arrowLeft" ng-click="$parent.openLeft(photo, this)">
+        <td class="arrowLeft" ui-sref="main.photo(previousPhoto)">
           <span>&lt;</span>
         </td>
         <td>
@@ -20,7 +22,7 @@
               />
           </a>
         </td>
-        <td class="arrowRight" ng-click="$parent.openRight(photo, this)">
+        <td class="arrowRight" ui-sref="main.photo(nextPhoto)">
           <span>&gt;</span>
         </td>
       </tr>
@@ -49,9 +51,9 @@
           <dt>Date de modification</dt>
           <dd>{{photo.dateLastModified | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
           <span ng-if="photo.selected != null">
-            <dt>Date de sélection</dt>
-            <dd ng-if="photo.selected > 0">{{photo.selected | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
-            <dd ng-if="photo.selected === 0">Inconnue</dd>
+          <dt>Date de sélection</dt>
+          <dd ng-if="photo.selected > 0">{{photo.selected | date:'H:m:s le EEEE d MMMM yyyy'}}</dd>
+          <dd ng-if="photo.selected === 0">Inconnue</dd>
           </span>
           <dt>Taille</dt>
           <dd>{{photo.size | fileSizeFormat}}</dd>

@@ -4,6 +4,6 @@ angular.module('htmlApp')
       {
         url: '/',
         templateUrl: 'main/view.html',
-        controller: 'MainCtrl as main'
+        controller: 'MainCtrl as mainCtrl'
       });
   });

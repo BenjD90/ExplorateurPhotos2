@@ -1,15 +1,7 @@
-'use strict';
+"use strict";
 
-/**
- * @ngdoc service
- * @name htmlApp.Config
- * @description
- * # Config
- * Constant in the htmlApp.
- */
-angular.module('htmlApp')
-  .constant('Config', {
-    //urlServices: '//' + location.hostname + '/browser2/api/api',
-    urlServices: '//' + location.hostname + ':8081/api',
-    thumbnailsHeight: 150
-  });
+angular.module('htmlApp-config', [])
+
+.constant('Config', {thumbnailsHeight:150,urlServices:'//localhost:8081/api'})
+
+;

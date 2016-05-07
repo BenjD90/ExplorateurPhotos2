@@ -1,4 +1,4 @@
-<div class="mainPage" resize>
+<div class="mainPage" resize ng-hide="$state.includes('main.photo')">
   <!-- TODO change filter/sort do like PLEX -->
   <div class="filter" ng-show="showFilter">
     <uib-tabset>
@@ -94,10 +94,11 @@
       <a ng-repeat-start="photoLight in line" class="photo">
         <img ng-src="{{urlThumbnail}}?path={{photoLight.path | urlEncode}}&height={{photoLight.heightThumbnail}}"
              height="{{photoLight.heightThumbnail}}"
-             width="{{photoLight.widthThumbnail}}" title="{{photoLight | json}}" ng-click="open(photoLight)"/>
+             width="{{photoLight.widthThumbnail}}" title="{{photoLight | json}}" ui-sref="main.photo(photoLight)"/>
         <span class="selected" ng-show="photoLight.selected !== null">★</span>
       </a>
       <a ng-repeat-end></a>
     </div>
   </div>
 </div>
+<ui-view></ui-view>
