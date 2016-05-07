@@ -9,3 +9,5 @@
 .idea
 *.iml
 *.idea
+
+app/common/constants/config.js

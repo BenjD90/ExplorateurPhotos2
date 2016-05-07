@@ -10,6 +10,7 @@
  */
 angular
   .module('htmlApp', [
+    'htmlApp-config',
     'ngAnimate',
     'ngCookies',
     'ngMessages',

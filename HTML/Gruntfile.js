@@ -12,6 +12,8 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+  grunt.loadNpmTasks('grunt-ng-constant');
+
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
@@ -30,6 +32,36 @@ module.exports = function (grunt) {
 
     // Project settings
     yeoman: appConfig,
+
+    ngconstant: {
+      options: {
+        name: 'htmlApp-config',
+        wrap: '"use strict";\n\n{%= __ngModule %}',
+        space: '  '
+      },
+      development: {
+        options: {
+          dest: '<%= yeoman.app %>/common/constants/config.js'
+        },
+        constants: {
+          Config: {
+            thumbnailsHeight: 150,
+            urlServices: '//localhost:8081/api'
+          }
+        }
+      },
+      production: {
+        options: {
+          dest: '<%= yeoman.app %>/common/constants/config.js'
+        },
+        constants: {
+          Config: {
+            thumbnailsHeight: 150,
+            urlServices: '/browser2/api/api'
+          }
+        }
+      }
+    },
 
     // Watches files for changes and runs tasks based on the changed files
     watch: {
@@ -418,6 +450,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+      'ngconstant:development',
       'wiredep',
       'concurrent:server',
       'autoprefixer:server',
@@ -433,6 +466,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
+    'ngconstant:development',
     'wiredep',
     'concurrent:test',
     'autoprefixer',
@@ -442,6 +476,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
+    'ngconstant:production',
     'wiredep',
     'useminPrepare',
     'concurrent:dist',
@@ -460,6 +495,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
+    'ngconstant:development',
     'test',
     'build'
   ]);
