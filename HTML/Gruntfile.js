@@ -270,9 +270,9 @@ module.exports = function (grunt) {
 
     // Performs rewrites based on filerev and the useminPrepare configuration
     usemin: {
-      html: ['<%= yeoman.dist %>/{,*/}*.html'],
-      css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
-      js: ['<%= yeoman.dist %>/scripts/{,*/}*.js'],
+      html: ['<%= yeoman.dist %>/**/*.html'],
+      css: ['<%= yeoman.dist %>/styles/**/*.css'],
+      js: ['<%= yeoman.dist %>/scripts/**/*.js'],
       options: {
         assetsDirs: [
           '<%= yeoman.dist %>',
@@ -358,7 +358,7 @@ module.exports = function (grunt) {
           usemin: 'scripts/scripts.js'
         },
         cwd: '<%= yeoman.app %>',
-        src: 'views/{,*/}*.html',
+        src: '*/{,*/}*.html',
         dest: '.tmp/templateCache.js'
       }
     },
@@ -412,9 +412,9 @@ module.exports = function (grunt) {
       },
       styles: {
         expand: true,
-        cwd: '<%= yeoman.app %>/styles',
+        cwd: '<%= yeoman.app %>',
         dest: '.tmp/styles/',
-        src: '{,*/}*.css'
+        src: '**/*.css'
       }
     },
 
@@ -495,8 +495,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
-    'ngconstant:development',
-    'test',
     'build'
   ]);
 };

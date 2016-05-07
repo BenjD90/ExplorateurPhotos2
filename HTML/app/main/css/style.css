@@ -83,7 +83,7 @@ a {
 }
 
 .mainPage .photosList .photo img {
-  background-image: url('defaultImg.gif');
+  background-image: url('/images/defaultImg.gif');
 }
 
 .mainPage .photosList .photo .selected {
