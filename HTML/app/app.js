@@ -21,7 +21,8 @@ angular
     'vs-repeat',
     'ui.bootstrap',
     'ui.router',
-    'snap'
+    'snap',
+    'angular-loading-bar'
   ])
   .config(function ($stateProvider, $urlRouterProvider) {
 

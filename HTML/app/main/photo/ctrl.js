@@ -8,7 +8,7 @@
  * Controller of the htmlApp
  */
 angular.module('htmlApp')
-  .controller('MainPhotoCtrl', function ($scope, $q, photoLight, Config, photoModalService) {
+  .controller('MainPhotoCtrl', function ($scope, $q, photoLight, Config, PhotosService) {
     $scope.photo = photoLight;
     $scope.urlThumbnail = Config.urlServices + "/thumbnail";
 
@@ -30,21 +30,23 @@ angular.module('htmlApp')
         $scope.width = maxWidth;
       }
     } else {
-      $scope.height = null;
-      $scope.width = null;
+      $scope.height = $scope.photo.height;
+      $scope.width = $scope.photo.width;
     }
 
 
-    $scope.$parent.$watch('listPhotosToDisplay', function (newValue, oldValue) {
-      if (!newValue) {
-        return;
-      }
-      getNextPhoto().then(function (p) {
-        $scope.nextPhoto = p;
-      });
+    PhotosService.getListPhotos().then(function () {
+      $scope.$parent.$watch('listPhotosToDisplay', function (newValue, oldValue) {
+        if (!newValue) {
+          return;
+        }
+        getNextPhoto().then(function (p) {
+          $scope.nextPhoto = p;
+        });
 
-      getPreviousPhoto().then(function (p) {
-        $scope.previousPhoto = p;
+        getPreviousPhoto().then(function (p) {
+          $scope.previousPhoto = p;
+        });
       });
     });
 
