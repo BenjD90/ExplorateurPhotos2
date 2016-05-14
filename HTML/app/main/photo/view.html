@@ -18,7 +18,7 @@
                  height="{{height}}"
                  width="{{width}}"
                  id="photoModal"
-                 style="background-image: url('{{urlThumbnail}}?path={{photo.path | urlEncode}}&height={{photo.heightThumbnail}}'); background-size: 100% 100%;"
+                 style="background-image: url('{{urlThumbnail}}?path={{photo.path | urlEncode | escapeForCssUrl}}&height={{photo.heightThumbnail}}'); background-size: 100% 100%;"
               />
           </a>
         </td>
